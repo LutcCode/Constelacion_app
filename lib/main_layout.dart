@@ -1,5 +1,7 @@
 // lib/main_layout.dart
 
+import 'package:constelacion/categoriaPage.dart';
+import 'package:constelacion/resenaNueva.dart';
 import 'package:flutter/material.dart';
 import 'package:constelacion/resenaPage.dart';
 import 'package:constelacion/foro_screen.dart';
@@ -17,9 +19,9 @@ class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 2;
 
   final List<Widget> _screens = [
-    const ForoScreen(),
+    const resenaNueva(),
     const PerfilScreen(),
-    const resenaPage(),
+    const categoriaPage(),
   ];
 
   void _onTabTapped(int index) {
@@ -38,7 +40,7 @@ class _MainLayoutState extends State<MainLayout> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.forum_outlined),
-            label: AppStrings.navForo,
+            label: AppStrings.navResenias,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
@@ -46,7 +48,7 @@ class _MainLayoutState extends State<MainLayout> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),
-            label: AppStrings.navResenias,
+            label: "Categorias",
           ),
         ],
       ),

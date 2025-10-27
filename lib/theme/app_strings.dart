@@ -1,28 +1,70 @@
 // lib/constants/app_strings.dart
 
 class AppStrings {
-  // Constructor privado para evitar que se instancie la clase
+
   AppStrings._();
 
-  // --- Nombres de la App ---
-  static const String appName = "Constelación Literaria";
+  static const String appName = "Constelación de Libros";
 
-  // --- Etiquetas de la Barra de Navegación ---
-  static const String navForo = "Foro";
   static const String navResenias = "Reseñas";
   static const String navPerfil = "Perfil";
+// Pagina de Inicio de Sesion
+  static const String correo = "Correo";
+  static const String contrasena = "Contraseña";
+  static const String registrarse = "Registrarse";
+  static const String olvideContraena = "¿Olvidaste tu contraseña?";
+// Pagina de Recuperación de contraseña
+  static const String recuperarContrasena = "Recuperar contraseña";
+  static const String token = "Token";
+  static const String enviar = "Enviar";
+// Pagina de Cambio de contraseña
+  static const String cambiarContrasena = "Cambiar contraseña";
+  static const String nuevaContrasena = "Ingresa tu nueva contraseña";
+  static const String confirmarContrasena = "Confirmar contraseña";
+  static const String guardar = "Guardar";
+// Pagina de Registro
+  static const String registro = "Registro";
+  static const String nombre = "Nombre";
+  static const String usuario = "Usuario";
+  static const String fechaNacimiento = "Fecha de nacimiento";
+  static const String registrar = "Registrar";
+// Pagina de Libreria
+  static const String libreria = "Mi Libreria";
+  static const String libros = "Libros";
+// Pagina de Libro
+  static const String miLectura = "Mi Lectura";
+  static const String titulo = "Titulo";
+  static const String autor = "Autor";
+  static const String fechaInicio = "Fecha de inicio";
+  static const String fechaTermino = "Fecha de termino";
+  static const String noPaginasa = "No. de Paginas";
+  static const String genero = "Genero";
+  static const String personajeFav = "Personaje Favorito";
+  static const String personajeOdiado = "Personaje Odiado";
+  static const String clasificacion = "Clasificación";
+  static const String fraseFavorita = "Frase Favorita";
+  static const String descripcion = "Descripción";
+  static const String comentarios = "Comentarios";
+  static const String calificacion = "Calificación";
 
-  // --- Pantalla de Reseña ---
-  static const String reseniaBookTitle = "EL VALS DE LA BRUJA";
-  static const String reseniaFieldTitulo = "Titulo";
-  static const String reseniaFieldAutor = "Autor (a)";
-  static const String reseniaCalificacion = "CALIFICACIÓN";
-  static const String reseniaAcercaDe = "ACERCA DE EL VALS DE LA BRUJA";
-  static const String reseniaOpiniones = "OPINIONES";
-  static const String reseniaBookAuthor = "Belén Martínez";
-  static const String reseniaDescription = "Londres, 1895. Tras la muerte de sus padres, Eliza Kyteler y su hermana pequeña se mudan a la mansión de su tío, un reputado espiritista que se ofrece a acogerlas...";
+// Pagina de Perfil
+  static const String perfil = "Perfil";
+  static const String editarPerfil = "Editar Perfil";
+  static const String cerrarSesion = "Cerrar Sesión";
+  static const String listaLecturas = "Lista de Lecturas";
+  static const String listaFavoritos = "Lista de Favoritos";
+  static const String salir = "Salir";
+  static const String eliminarCuenta = "Eliminar Cuenta";
 
-  // --- Pantallas de Platzhalter ---
-  static const String foroScreenTitle = "Pantalla del Foro";
-  static const String perfilScreenTitle = "Pantalla de Perfil";
+// Pagina de Premium
+  static const String premiun = "Premium";
+  static const String suscribirse = "Deseas adquirir la version premium";
+  static const String si = "Si";
+  static const String no = "No";
+
+// Pagina de Reseñas
+  static const String misresenas = "Mis reseñas";
+  static const String resenasGenerales = "Reseñas Generales";
+  static const String acercaDe = "Acerca de";
+  static const String resena = "Reseña";
 }

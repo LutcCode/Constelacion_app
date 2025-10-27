@@ -1,7 +1,7 @@
 class Ambiente {
 
-  String urlServer = "";
-  int idUser = 1;
-  String rol = "";
+  static String urlServer = "http://127.0.0.1:8000";
+  static int idUser = 1;
+  static String rol = "";
 
 }

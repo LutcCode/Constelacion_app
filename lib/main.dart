@@ -4,7 +4,6 @@ import 'package:constelacion/main_layout.dart';
 import 'package:flutter/material.dart';
 // 1. Importa tu nuevo archivo de tema
 import 'package:constelacion/theme/app_theme.dart';
-import 'package:constelacion/resenia.dart';
 
 void main() {
   runApp(const MyApp());
