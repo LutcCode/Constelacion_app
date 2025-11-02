@@ -47,7 +47,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
   double _misterioRating = 0.0;
   double _finalRating = 0.0;
 
-  // NUEVO: Inicializa el listener para actualizar la imagen
+  // Este inicializa el listener para actualizar la imagen
   @override
   void initState() {
     super.initState();
@@ -55,14 +55,14 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     _linkController.addListener(_updateLinkImage);
   }
 
-  // NUEVO: Método para forzar el redibujo y mostrar la imagen
+  // metodo para forzar el redibujo y mostrar la imagen
   void _updateLinkImage() {
     setState(() {});
   }
 
   @override
   void dispose() {
-    // IMPORTANTE: Remueve el listener antes de liberar el controlador
+    // Aquíe deberemos reomover el listener antes de liberar el controlador
     _linkController.removeListener(_updateLinkImage);
 
     _tituloController.dispose();
@@ -102,7 +102,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
               print('Datos a enviar:');
               print('Título: ${_tituloController.text}');
               print('Tipo de Historia: $_selectedStoryType');
-              // ... Puedes imprimir todas las variables aquí para verificar ...
+              // Esto splo imprime todas las variables para verificar ...
             },
             child: const Text(AppStrings.guardar, style: TextStyle(color: Colors.white)),
           ),
