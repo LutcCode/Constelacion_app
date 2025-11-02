@@ -5,7 +5,7 @@ import 'package:constelacion/resenaNueva.dart';
 import 'package:flutter/material.dart';
 import 'package:constelacion/resenaPage.dart';
 import 'package:constelacion/foro_screen.dart';
-import 'package:constelacion/perfil_screen.dart';
+import 'package:constelacion/PerfilPage.dart';
 import 'package:constelacion/theme/app_strings.dart';
 
 class MainLayout extends StatefulWidget {
@@ -20,8 +20,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _screens = [
     const resenaNueva(),
-    const PerfilScreen(),
-    const categoriaPage(),
+    const PerfilPage(),
   ];
 
   void _onTabTapped(int index) {

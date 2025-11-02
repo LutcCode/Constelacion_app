@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:constelacion/theme/app_strings.dart';
 
 class resenaNueva extends StatefulWidget {
-  const resenaNueva({super.key});
+  const resenaNueva({super.key, required List<Map<String, String>> libros});
 
   @override
   State<resenaNueva> createState() => _resenaNuevaState();
