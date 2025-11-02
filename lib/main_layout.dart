@@ -5,8 +5,10 @@ import 'package:constelacion/resenaNueva.dart';
 import 'package:flutter/material.dart';
 import 'package:constelacion/resenaPage.dart';
 import 'package:constelacion/foro_screen.dart';
+import 'package:constelacion/loginPage.dart';
 import 'package:constelacion/perfil_screen.dart';
 import 'package:constelacion/theme/app_strings.dart';
+import 'package:constelacion/create_book_screen.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -20,8 +22,8 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _screens = [
     const resenaNueva(),
-    const PerfilScreen(),
-    const categoriaPage(),
+    const CreateBookScreen(),
+    const loginPage(),
   ];
 
   void _onTabTapped(int index) {
@@ -44,7 +46,7 @@ class _MainLayoutState extends State<MainLayout> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            label: AppStrings.navPerfil,
+            label: AppStrings.miLectura,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),

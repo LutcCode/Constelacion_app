@@ -47,6 +47,21 @@ class AppStrings {
   static const String comentarios = "Comentarios";
   static const String calificacion = "Calificación";
 
+  static const String fechaPublicacion = "Fecha de Publicación";
+  static const String tipoLibroFisico = "Físico";
+  static const String tipoLibroDigital = "Digital";
+
+  static const String generoTerror = "Terror";
+  static const String generoAmor = "Romance";
+  static const String generoFantasia = "Fantasía";
+  static const String generoMisterio = "Misterio";
+
+  static const String tipoHistoria = "Tipo de Historia";
+  static const String autoconclusivo = "Autoconclusivo";
+  static const String saga = "Saga";
+  static const String bilogia = "Bilogía";
+  static const String trilogia = "Trilogía";
+
 // Pagina de Perfil
   static const String perfil = "Perfil";
   static const String editarPerfil = "Editar Perfil";
