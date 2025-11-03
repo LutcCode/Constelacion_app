@@ -9,35 +9,42 @@ class resenaPage extends StatefulWidget {
 }
 
 class _resenaPageState extends State<resenaPage> {
-  // AJUSTE: Inicializamos la URL como una cadena vacía.
-  String _imageUrl = '';
-  late final TextEditingController _urlController;
-
-  @override
-  void initState() {
-    super.initState();
-    _urlController = TextEditingController(text: _imageUrl);
-  }
-
-  @override
-  void dispose() {
-    _urlController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Center(
-              child: Text('${AppStrings.appName}'
-              ),
+        appBar: AppBar(title: Text('${AppStrings.appName}')),
+        body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 1, child: Container()),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        children: [
+                          TextField(
+                            decoration: InputDecoration(labelText: 'Título'),
+                          ),
+                          TextField(
+                            decoration: InputDecoration(labelText: 'Autor'),
+                          ),
+                          const Text('Calificacion'),
+                          TextField(
+                            decoration: InputDecoration(labelText: '4.5'),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                TextField(decoration: InputDecoration(labelText: 'Categoría')),
+                TextField(decoration: InputDecoration(labelText: 'Opiniones')),
+              ],
             ),
-          ],
         ),
-      ),
     );
   }
 }

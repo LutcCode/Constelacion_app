@@ -10,7 +10,7 @@ import 'package:constelacion/resenaNueva.dart';
 import 'package:constelacion/foro_screen.dart';
 import 'package:constelacion/loginPage.dart';
 import 'package:constelacion/theme/app_strings.dart';
-import 'package:constelacion/create_book_screen.dart';
+import 'package:constelacion/libreriaNuevo.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -23,7 +23,7 @@ class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 1;
 
   final List<Widget> _screens = [
-    const resenaPage(),
+    const resenaNueva(),
     const LibreriaPage(),
     const PerfilPage(nombre: "ulises", usuario: "Vampirecell")
   ];

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:constelacion/models/ambiente.dart';
 import 'package:constelacion/usuariosPage.dart';
 import 'package:constelacion/models/lectorModel.dart';
+import 'package:quickalert/quickalert.dart';
 
 class Usuariosnuevo extends StatefulWidget {
   const Usuariosnuevo({super.key});
@@ -24,10 +25,7 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
 
   Future<void> guardarLector() async {
     final response = await http.post(
-      Uri.parse('${Ambiente.urlServer}/api/persona'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
+      Uri.parse('${Ambiente.urlServer}/api/persona/new'),
       body: jsonEncode(<String, dynamic>{
         'name': txtName.text,
         'app_lector': txtAppLector.text,
@@ -36,15 +34,28 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
         'fecha_nacimiento': txtFechaNacimiento.text,
         'email': txtEmail.text,
         'password': txtPassword.text,
-        'suscripcion': 1
+        'suscripcion': false
       }),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
     );
 
-    final jsonResponse = jsonDecode(response.body);
-    if (jsonResponse['status'] == 'ok') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const loginPage()),
+    if (response.body == 'ok') {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.success,
+        text: 'Registro realizado Correctamente',
+        confirmBtnText: 'Continuar',
+        onConfirmBtnTap: () {
+          Navigator.pop(context);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const loginPage(),
+            ),
+          );
+        },
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:quickalert/quickalert.dart';
 import '../theme/app_strings.dart';
-import '../widgets/rating_slider.dart';
+// Asegúrate de que esta ruta sea correcta para tu modelo.
+import 'package:constelacion/models/LibroModel.dart';
+import 'package:constelacion/libreriaPage.dart';
+import 'package:constelacion/models/ambiente.dart';
+
 
 class CreateBookScreen extends StatefulWidget {
   const CreateBookScreen({super.key});
@@ -11,6 +18,7 @@ class CreateBookScreen extends StatefulWidget {
 
 class _CreateBookScreenState extends State<CreateBookScreen> {
 
+  // Controles de texto
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _autorController = TextEditingController();
   final TextEditingController _paginasController = TextEditingController();
@@ -35,36 +43,23 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
   // Fecha
   DateTime? _fechaPublicacion;
 
-  // Clasificación (Sliders)
-  double _romanceRating = 0.0;
-  double _divertidoRating = 0.0;
-  double _enojoRating = 0.0;
-  double _tristezaRating = 0.0;
-  double _fantasiaRating = 0.0;
-  double _reflexionRating = 0.0;
-  double _spicyRating = 0.0;
-  double _tramaRating = 0.0;
-  double _misterioRating = 0.0;
-  double _finalRating = 0.0;
+  // URL del endpoint de Laravel, usando tu Ambiente.urlServer
+  final String _apiUrl = '${Ambiente.urlServer}/api/libro/new';
 
-  // Este inicializa el listener para actualizar la imagen
   @override
   void initState() {
     super.initState();
-    // Escucha los cambios en el campo del link para redibujar la imagen
     _linkController.addListener(_updateLinkImage);
+    _selectedGenre = _genres.first;
   }
 
-  // metodo para forzar el redibujo y mostrar la imagen
   void _updateLinkImage() {
     setState(() {});
   }
 
   @override
   void dispose() {
-    // Aquíe deberemos reomover el listener antes de liberar el controlador
     _linkController.removeListener(_updateLinkImage);
-
     _tituloController.dispose();
     _autorController.dispose();
     _paginasController.dispose();
@@ -75,7 +70,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     super.dispose();
   }
 
-  // Lógica de selección de fecha de publicación
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -90,6 +84,83 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     }
   }
 
+  // -----------------------------------------------------------------
+  // FUNCIÓN DE GUARDADO CON QUICKALERT
+  // -----------------------------------------------------------------
+  Future<void> _saveBook() async {
+    // 1. Validaciones básicas
+    if (_tituloController.text.isEmpty || _autorController.text.isEmpty || _selectedGenre == null || _fechaPublicacion == null) {
+      // Usamos QuickAlert para error de formulario
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.error,
+        title: 'Error de Formulario',
+        text: 'Por favor, completa el título, autor, género y fecha de publicación.',
+      );
+      return;
+    }
+
+    // 2. Crear el objeto Modelo con los datos del formulario (usando los nombres corregidos)
+    final newBook = LibroModel(
+      id_lector: Ambiente.idUser,
+      nombre_libro: _tituloController.text,
+      autor: _autorController.text,
+      no_paginas: _paginasController.text.isNotEmpty ? _paginasController.text : '0',
+      genero: _selectedGenre!,
+      tipoLibro: _selectedBookType,
+      modoLectura: _selectedStoryType,
+      fecha_publicacion: _fechaPublicacion!.toIso8601String().split('T')[0],
+
+      imagen: _linkController.text,
+      personaje_favorito: _personajeFavController.text,
+      personaje_odiado: _personajeOdiadoController.text,
+      fraseFavorita: _fraseFavoritaController.text,
+    );
+
+    // 3. Petición HTTP POST a Laravel
+    try {
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(newBook.toJson()),
+      );
+
+      // 4. Manejar la respuesta
+      if (response.statusCode == 200) {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text: '¡Libro guardado correctamente!',
+          confirmBtnText: 'Continuar',
+          onConfirmBtnTap: () {
+            Navigator.pop(context);
+          },
+        );
+      }else {
+        // Fallo en la petición
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: 'Error del Servidor',
+          text: 'Fallo al guardar el libro. Código: ${response.statusCode}. Revisa el log.',
+        );
+        print('JSON ENVIADO: ${jsonEncode(newBook.toJson())}');
+        print('Respuesta de Laravel: ${response.body}');
+      }
+    } catch (e) {
+      // Error de conexión
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.error,
+        title: 'Error de Conexión',
+        text: 'No se pudo conectar al servidor. Asegúrate de que Laravel esté corriendo. ($e)',
+      );
+      print('Error de Conexión: $e');
+    }
+  }
+
+  // Eliminamos la función _showAlertDialog ya que usamos QuickAlert
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,13 +168,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
         title: const Text(AppStrings.miLectura),
         actions: [
           TextButton(
-            onPressed: () {
-              // Aqi irá la lógica de Laravel para guardar
-              print('Datos a enviar:');
-              print('Título: ${_tituloController.text}');
-              print('Tipo de Historia: $_selectedStoryType');
-              // Esto splo imprime todas las variables para verificar ...
-            },
+            onPressed: _saveBook,
             child: const Text(AppStrings.guardar, style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -116,7 +181,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Columna del titulo,autor,fecha
                 Expanded(
                   child: Column(
                     children: [
@@ -127,7 +191,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Columna de la Imagen
                 _buildImageContainer(),
               ],
             ),
@@ -135,7 +198,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Columna Izquierda (Páginas, Género, Personajes)
                 Expanded(
                   child: Column(
                     children: [
@@ -147,14 +209,12 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Columna Derecha (Tipos de Libros, Saga y Link)
                 Expanded(
                   child: Column(
                     children: [
                       _buildBookTypeSelector(),
                       const SizedBox(height: 16),
                       _buildStoryTypeSelector(),
-                      // El campo de link ha sido movido aquí
                       _buildTextField(_linkController, 'LINK DE LA IMAGEN'),
                       const SizedBox(height: 16),
                     ],
@@ -164,12 +224,9 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
             ),
             const SizedBox(height: 24),
 
-            // --- CLASIFICACIÓN (Sliders) ---
             const Text(AppStrings.clasificacion, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            _buildRatingSliders(),
             const SizedBox(height: 24),
 
-            // FRASE FAVORITA
             _buildFavoritePhraseField(),
           ],
         ),
@@ -177,7 +234,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     );
   }
 
-  // WIDGETS AUXILIARES PARA LIMPIEZA DEL CÓDIGO
+  // WIDGETS AUXILIARES (sin cambios)
 
   Widget _buildTextField(TextEditingController controller, String label, {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
@@ -211,7 +268,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     );
   }
 
-  // WIDGET MODIFICADO PARA MOSTRAR LA IMAGEN DESDE LA URL
   Widget _buildImageContainer() {
     final imageUrl = _linkController.text;
 
@@ -308,7 +364,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     );
   }
 
-  // WIDGET PARA SELECCIONAR TIPO DE HISTORIA (SAGA/AUTOCONCLUSIVO)
   Widget _buildStoryTypeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,7 +376,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
     );
   }
 
-  // Widget auxiliar para simplificar los botones de radio de Saga
   Widget _buildStoryRadio(String title) {
     return ListTile(
       dense: true,
@@ -336,23 +390,6 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
           });
         },
       ),
-    );
-  }
-
-  Widget _buildRatingSliders() {
-    return Column(
-      children: [
-        RatingSlider(label: 'Romance', value: _romanceRating, onChanged: (v) => setState(() => _romanceRating = v)),
-        RatingSlider(label: 'Divertido', value: _divertidoRating, onChanged: (v) => setState(() => _divertidoRating = v)),
-        RatingSlider(label: 'Enojo', value: _enojoRating, onChanged: (v) => setState(() => _enojoRating = v)),
-        RatingSlider(label: 'Tristeza', value: _tristezaRating, onChanged: (v) => setState(() => _tristezaRating = v)),
-        RatingSlider(label: 'Fantasía', value: _fantasiaRating, onChanged: (v) => setState(() => _fantasiaRating = v)),
-        RatingSlider(label: 'Reflexión', value: _reflexionRating, onChanged: (v) => setState(() => _reflexionRating = v)),
-        RatingSlider(label: 'Spicy', value: _spicyRating, onChanged: (v) => setState(() => _spicyRating = v)),
-        RatingSlider(label: 'Trama', value: _tramaRating, onChanged: (v) => setState(() => _tramaRating = v)),
-        RatingSlider(label: 'Misterio', value: _misterioRating, onChanged: (v) => setState(() => _misterioRating = v)),
-        RatingSlider(label: 'Final', value: _finalRating, onChanged: (v) => setState(() => _finalRating = v)),
-      ],
     );
   }
 
