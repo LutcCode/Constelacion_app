@@ -78,7 +78,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CreateBookScreen()),
+            MaterialPageRoute(builder: (context) => const libreriaNuevo()),
           );
           fetchLibros();
         },

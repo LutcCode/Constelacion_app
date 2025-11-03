@@ -3,20 +3,19 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quickalert/quickalert.dart';
 import '../theme/app_strings.dart';
-// Asegúrate de que esta ruta sea correcta para tu modelo.
 import 'package:constelacion/models/LibroModel.dart';
 import 'package:constelacion/libreriaPage.dart';
 import 'package:constelacion/models/ambiente.dart';
 
 
-class CreateBookScreen extends StatefulWidget {
-  const CreateBookScreen({super.key});
+class libreriaNuevo extends StatefulWidget {
+  const libreriaNuevo({super.key});
 
   @override
-  State<CreateBookScreen> createState() => _CreateBookScreenState();
+  State<libreriaNuevo> createState() => _libreriaNuevoState();
 }
 
-class _CreateBookScreenState extends State<CreateBookScreen> {
+class _libreriaNuevoState extends State<libreriaNuevo> {
 
   // Controles de texto
   final TextEditingController _tituloController = TextEditingController();
