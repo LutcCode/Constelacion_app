@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:constelacion/main_layout.dart';
+import 'package:constelacion/models/lectorModel.dart';
 import 'package:constelacion/models/loginModel.dart';
 import 'package:constelacion/usuariosNuevo.dart';
 import 'package:constelacion/models/ambiente.dart';
+import 'package:constelacion/libreriaPage.dart';
 import 'package:constelacion/resenaPage.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
@@ -30,6 +33,20 @@ class _loginPageState extends State<loginPage> {
       },
     );
 
+    Future<void> cargarPersona() async {
+      final response = await http.get(
+        Uri.parse('${Ambiente.urlServer}/api/persona/${Ambiente.idUser}'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      Map<String, dynamic> responseJson = jsonDecode(response.body);
+      final persona = LectorModel.fromJson(responseJson);
+
+      Ambiente.idUser = persona.id;
+    }
+
     Map<String, dynamic> responseJson = jsonDecode(response.body);
     final loginResponse = LoginResponse.fromJson(responseJson);
 
@@ -46,7 +63,9 @@ class _loginPageState extends State<loginPage> {
           Navigator.pop(context);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const resenaPage()),
+            MaterialPageRoute(
+                builder: (context) => const MainLayout(),
+          ),
           );
         },
       );
@@ -108,7 +127,7 @@ class _loginPageState extends State<loginPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const Usuariosnuevo(idPersona: 0),
+                  builder: (context) => const Usuariosnuevo(),
                 ),
               );
             },

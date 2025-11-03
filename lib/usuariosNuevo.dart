@@ -7,8 +7,7 @@ import 'package:constelacion/usuariosPage.dart';
 import 'package:constelacion/models/lectorModel.dart';
 
 class Usuariosnuevo extends StatefulWidget {
-  final int idPersona;
-  const Usuariosnuevo({super.key, required this.idPersona});
+  const Usuariosnuevo({super.key});
 
   @override
   State<Usuariosnuevo> createState() => _UsuariosnuevoState();
@@ -23,35 +22,6 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
   final TextEditingController txtEmail = TextEditingController();
   final TextEditingController txtPassword = TextEditingController();
 
-  Future<void> cargarLector() async {
-    final response = await http.get(
-      Uri.parse('${Ambiente.urlServer}/api/persona/${widget.idPersona}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-    );
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> responseJson = jsonDecode(response.body);
-      final lector = LectorModel.fromJson(responseJson);
-
-      setState(() {
-        txtName.text = lector.name;
-        txtAppLector.text = lector.app_lector;
-        txtApmLector.text = lector.apm_lector;
-        txtEdad.text = lector.edad.toString();
-        txtFechaNacimiento.text = lector.fecha_nacimiento;
-        txtEmail.text = lector.email;
-        txtPassword.text = lector.password;
-
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al cargar el lector')),
-      );
-    }
-  }
-
   Future<void> guardarLector() async {
     final response = await http.post(
       Uri.parse('${Ambiente.urlServer}/api/persona'),
@@ -59,7 +29,6 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
         'Content-Type': 'application/json; charset=UTF-8'
       },
       body: jsonEncode(<String, dynamic>{
-        'id': widget.idPersona,
         'name': txtName.text,
         'app_lector': txtAppLector.text,
         'apm_lector': txtApmLector.text,
@@ -81,14 +50,6 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al guardar lector')),
       );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.idPersona != 0) {
-      cargarLector();
     }
   }
 

@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'lista_lecturas_page.dart';
-import 'resenas_page.dart';
+import 'package:constelacion/resenaPage.dart';
 
 class PerfilPage extends StatefulWidget {
   final String nombre;
   final String usuario;
 
-  const PerfilPage({
-    Key? key,
-    required this.nombre,
-    required this.usuario,
-  }) : super(key: key);
+  const PerfilPage({Key? key, required this.nombre, required this.usuario})
+    : super(key: key);
 
   @override
   State<PerfilPage> createState() => _PerfilPageState();
@@ -65,10 +61,7 @@ class _PerfilPageState extends State<PerfilPage> {
             child: PageView(
               controller: _pageController,
               onPageChanged: (index) => setState(() => _selectedPage = index),
-              children: const [
-                ListaLecturasPage(),
-                ResenasPage(),
-              ],
+              children: const [resenaPage()],
             ),
           ),
         ],
@@ -77,9 +70,6 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Widget _menuButton(String title, int index) {
-    return TextButton(
-      onPressed: () => _goToPage(index),
-      child: Text(title),
-    );
+    return TextButton(onPressed: () => _goToPage(index), child: Text(title));
   }
 }

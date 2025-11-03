@@ -61,7 +61,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Usuariosnuevo(idPersona: persona.id),
+                builder: (context) => Usuariosnuevo()
               ),
             ).then((_) => fnGetPersonas());
           },
@@ -92,7 +92,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const Usuariosnuevo(idPersona: 0),
+              builder: (context) => const Usuariosnuevo(),
             ),
           ).then((_) => fnGetPersonas());
         },
