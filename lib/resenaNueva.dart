@@ -9,15 +9,9 @@ class resenaNueva extends StatefulWidget {
 }
 
 class _resenaNuevaState extends State<resenaNueva> {
-  final TextEditingController _acercaController = TextEditingController();
-  final TextEditingController _resenaController = TextEditingController();
+  final TextEditingController txtacerca = TextEditingController();
+  final TextEditingController txtresena = TextEditingController();
 
-  @override
-  void dispose() {
-    _acercaController.dispose();
-    _resenaController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +24,8 @@ class _resenaNuevaState extends State<resenaNueva> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Campo “Acerca del libro”
                 TextField(
-                  controller: _acercaController,
+                  controller: txtacerca,
                   maxLines: 5,
                   decoration: const InputDecoration(
                     labelText: "Acerca del libro",
@@ -40,10 +33,8 @@ class _resenaNuevaState extends State<resenaNueva> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Campo “Reseña”
                 TextField(
-                  controller: _resenaController,
+                  controller: txtresena,
                   maxLines: 7,
                   decoration: const InputDecoration(
                     labelText: "Reseña",
@@ -51,12 +42,10 @@ class _resenaNuevaState extends State<resenaNueva> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
-                // Botón “Publicar”
                 ElevatedButton(
                   onPressed: () {
-                    print("Acerca del libro: ${_acercaController.text}");
-                    print("Reseña: ${_resenaController.text}");
+                    print("Acerca del libro: ${txtacerca.text}");
+                    print("Reseña: ${txtresena.text}");
                   },
                   child: const Text("Publicar"),
                 ),

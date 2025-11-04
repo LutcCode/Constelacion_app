@@ -55,11 +55,10 @@ class LibroModel {
         imagen = json['imagen'] ?? '',
         personaje_favorito = json['personaje_favorito'] ?? '',
         personaje_odiado = json['personaje_odiado'] ?? '',
-
         genero = json['genero'] ?? '',
         tipoLibro = json['tipo-libro'] ?? '',
         modoLectura = json['modo-lectura'] ?? '',
-        fraseFavorita = json['frase-avorita'] ?? '';
+        fraseFavorita = json['frase_favorita'] ?? '';
 
   Map<String, dynamic> toJson() {
     return {

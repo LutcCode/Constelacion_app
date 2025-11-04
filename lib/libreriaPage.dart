@@ -1,7 +1,8 @@
+import 'package:constelacion/resenaNueva.dart';
+import 'package:constelacion/resenaPage.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'package:constelacion/models/ambiente.dart';
 import 'package:constelacion/models/LibroModel.dart';
 import 'package:constelacion/theme/app_strings.dart';
@@ -19,7 +20,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
   List<LibroModel> _libros = [];
   bool _isLoading = true;
 
-  final String _apiUrl = '${Ambiente.urlServer}/api/libros';
+  //final String _apiUrl = '${Ambiente.urlServer}/api/libros/lector/${Ambiente.idUser}';
 
   @override
   void initState() {
@@ -36,10 +37,16 @@ class _LibreriaPageState extends State<LibreriaPage> {
       return;
     }
 
-    // El endpoint de Laravel /api/libros
     try {
       final response = await http.post(
-        Uri.parse(_apiUrl),
+        //Uri.parse(_apiUrl),
+          Uri.parse('${Ambiente.urlServer}/api/libros/lector'),
+          body: jsonEncode(<String, dynamic>{
+            'id_lector': Ambiente.idUser,
+          }),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8'
+          }
       );
 
       if (response.statusCode == 200) {
@@ -114,7 +121,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
             return _BookGridItem(
               title: libro.nombre_libro,
               author: libro.autor,
-              imageUrl: libro.imagen, // Pasamos la URL de la imagen
+              imageUrl: libro.imagen,
             );
           },
         ),
@@ -122,8 +129,6 @@ class _LibreriaPageState extends State<LibreriaPage> {
     );
   }
 }
-
-// --- WIDGET AUXILIAR PARA REPRESENTAR CADA LIBRO ---
 
 class _BookGridItem extends StatelessWidget {
   final String title;
@@ -184,6 +189,41 @@ class _BookGridItem extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {
               // TODO: Navegación a la Reseña del libro
+            },
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            ),
+            child: const Text("Ver", style: TextStyle(fontSize: 10)),
+          ),
+        ),
+        const SizedBox(height: 4),
+
+        // 3. Botón de Reseña
+        SizedBox(
+          height: 20,
+          child: ElevatedButton(
+            onPressed: () {
+              // TODO: Navegación a la Reseña del libro
+            },
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            ),
+            child: const Text("Actualizar", style: TextStyle(fontSize: 10)),
+          ),
+        ),
+        const SizedBox(height: 4),
+
+        // 3. Botón de Reseña
+        SizedBox(
+          height: 20,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const resenaNueva()),
+              );
             },
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.zero,

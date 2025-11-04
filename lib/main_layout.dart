@@ -1,10 +1,9 @@
-// lib/main_layout.dart
-
 import 'package:constelacion/PerfilPage.dart';
 import 'package:constelacion/categoriaPage.dart';
 import 'package:constelacion/libreriaPage.dart';
 import 'package:constelacion/resenaNueva.dart';
 import 'package:constelacion/resenaPage.dart';
+import 'package:constelacion/resenasPage.dart';
 import 'package:flutter/material.dart';
 import 'package:constelacion/resenaNueva.dart';
 import 'package:constelacion/foro_screen.dart';
@@ -23,7 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 1;
 
   final List<Widget> _screens = [
-    const resenaNueva(),
+    const ResenasPage(),
     const LibreriaPage(),
     const PerfilPage(nombre: "ulises", usuario: "Vampirecell")
   ];
@@ -48,11 +47,11 @@ class _MainLayoutState extends State<MainLayout> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),
-            label: "Categorias",
+            label: AppStrings.miLectura,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            label: AppStrings.miLectura,
+            label: AppStrings.perfil,
           ),
 
         ],
