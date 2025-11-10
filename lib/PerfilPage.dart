@@ -61,7 +61,7 @@ class _PerfilPageState extends State<PerfilPage> {
             child: PageView(
               controller: _pageController,
               onPageChanged: (index) => setState(() => _selectedPage = index),
-              children: const [resenaPage()],
+              children: const [resenaPage(idResena: 0,)],
             ),
           ),
         ],
