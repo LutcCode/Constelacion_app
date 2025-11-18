@@ -7,8 +7,6 @@ class ResenaModel {
   final String autor;
   final String imagen;
 
-
-
   ResenaModel({
     required this.id,
     required this.id_libro,
@@ -19,15 +17,12 @@ class ResenaModel {
     required this.imagen,
   });
 
-  factory ResenaModel.fromJson(Map<String, dynamic> json) {
-    return ResenaModel(
-      id: json['id'] ?? 0,
-      id_libro: json['id_libro'] ?? 0,
-      descripcion: json['descripcion'] ?? '',
-      resena: json['resena'] ?? '',
-      titulo: json['nombre_libro'] ?? '',
-      autor: json['autor'] ?? '',
-      imagen: json['imagen'] ?? '',
-    );
-  }
+  ResenaModel.fromJson(Map<String, dynamic> json)
+    : id = json['id'] ?? 0,
+      id_libro = json['id_libro'] ?? 0,
+      descripcion = json['descripcion'] ?? '',
+      resena = json['resena'] ?? '',
+      titulo = json['nombre_libro'] ?? '',
+      autor = json['autor'] ?? '',
+      imagen = json['imagen'] ?? '';
 }

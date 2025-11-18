@@ -1,12 +1,11 @@
-import 'package:constelacion/resenaNueva.dart';
-import 'package:constelacion/resenaPage.dart';
-import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:constelacion/libroNuevo.dart';
+import 'package:constelacion/resenaNueva.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:constelacion/models/ambiente.dart';
 import 'package:constelacion/models/LibroModel.dart';
 import 'package:constelacion/theme/app_strings.dart';
-import 'package:constelacion/libreriaNuevo.dart';
 
 class LibreriaPage extends StatefulWidget {
   const LibreriaPage({super.key});
@@ -16,223 +15,166 @@ class LibreriaPage extends StatefulWidget {
 }
 
 class _LibreriaPageState extends State<LibreriaPage> {
-  // Estado para la lista de libros
-  List<LibroModel> _libros = [];
-  bool _isLoading = true;
+  List<LibroModel> libros = [];
+  bool isLoading = true;
 
-  //final String _apiUrl = '${Ambiente.urlServer}/api/libros/lector/${Ambiente.idUser}';
+  Future<void> CargarLibros() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Ambiente.urlServer}/api/libros/lector/completo'),
+        body: jsonEncode(<String, dynamic>{'id_lector': Ambiente.idUser}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        Iterable responseJson = jsonDecode(response.body);
+        libros = List<LibroModel>.from(
+          responseJson.map((model) => LibroModel.fromJson(model)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al cargar los libros')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Widget _gridLibros() {
+    if (libros.isEmpty) {
+      return const Center(child: Text('No hay reseñas disponibles'));
+    }
+    return GridView.builder(
+      padding: const EdgeInsets.all(10.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 10.0,
+        childAspectRatio: 0.65,
+      ),
+      itemCount: libros.length,
+      itemBuilder: (context, index) {
+        final libro = libros[index];
+        return Card(
+            clipBehavior: Clip.antiAlias,
+            elevation: 3.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child:
+                      libro.imagen.isNotEmpty
+                          ? Image.network(
+                            libro.imagen,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => const Center(
+                                  child: Icon(
+                                    Icons.book,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                          )
+                          : const Center(
+                            child: Icon(
+                              Icons.book,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                          ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    libro.nombre_libro,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.rate_review, size: 20),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => resenaNueva(idResena: libro.id),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 20),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => resenaNueva(idResena: libro.id),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.visibility, size: 20),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => resenaNueva(idResena: libro.id_resena),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    fetchLibros();
-  }
-
-  Future<void> fetchLibros() async {
-    if (Ambiente.idUser == 0) {
-      setState(() {
-        _isLoading = false;
-      });
-      print("Error: Ambiente.idUser es 0. Asegúrate de iniciar sesión.");
-      return;
-    }
-
-    try {
-      final response = await http.post(
-        //Uri.parse(_apiUrl),
-          Uri.parse('${Ambiente.urlServer}/api/libros/lector'),
-          body: jsonEncode(<String, dynamic>{
-            'id_lector': Ambiente.idUser,
-          }),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          }
-      );
-
-      if (response.statusCode == 200) {
-        // Asumimos que Laravel devuelve una lista JSON
-        List jsonList = jsonDecode(response.body);
-
-        setState(() {
-          // Mapeamos la lista JSON a una lista de LibroModel
-          _libros = jsonList.map((json) => LibroModel.fromJson(json)).toList();
-          _isLoading = false;
-        });
-      } else {
-        print('Error al cargar libros. Código: ${response.statusCode}');
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error de Conexión al cargar libros: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    CargarLibros();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.libreria),
-      ),
-      body: _buildBody(),
-
-      // Botón flotante para agregar un nuevo libro (+)
+      appBar: AppBar(title: const Text(AppStrings.libreria)),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _gridLibros(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const libreriaNuevo()),
+            MaterialPageRoute(builder: (context) => const LibroNuevo()),
           );
-          fetchLibros();
         },
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  // Widget para manejar los diferentes estados de la vista
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_libros.isEmpty) {
-      return const Center(child: Text("¡Aún no tienes libros! Agrega uno."));
-    }
-
-    return RefreshIndicator(
-      onRefresh: fetchLibros, // Permite recargar deslizando hacia abajo
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: GridView.builder(
-          itemCount: _libros.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 10.0,
-            mainAxisSpacing: 10.0,
-            childAspectRatio: 0.5,
-          ),
-          itemBuilder: (context, index) {
-            final libro = _libros[index];
-            return _BookGridItem(
-              title: libro.nombre_libro,
-              author: libro.autor,
-              imageUrl: libro.imagen,
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _BookGridItem extends StatelessWidget {
-  final String title;
-  final String author;
-  final String imageUrl;
-
-  const _BookGridItem({
-    required this.title,
-    required this.author,
-    required this.imageUrl,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // 1. Contenedor de la Portada
-        Expanded(
-          flex: 4,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            // Si la URL es válida, muestra la imagen; si no, muestra 'Portada'
-            child: imageUrl.isNotEmpty
-                ? Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.book, size: 30)),
-            )
-                : const Center(child: Text("Portada")),
-          ),
-        ),
-        const SizedBox(height: 4),
-
-        // 2. Título y Autor
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          author,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 10),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-
-        // 3. Botón de Reseña
-        SizedBox(
-          height: 20,
-          child: ElevatedButton(
-            onPressed: () {
-              // TODO: Navegación a la Reseña del libro
-            },
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-            ),
-            child: const Text("Ver", style: TextStyle(fontSize: 10)),
-          ),
-        ),
-        const SizedBox(height: 4),
-
-        // 3. Botón de Reseña
-        SizedBox(
-          height: 20,
-          child: ElevatedButton(
-            onPressed: () {
-              // TODO: Navegación a la Reseña del libro
-            },
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-            ),
-            child: const Text("Actualizar", style: TextStyle(fontSize: 10)),
-          ),
-        ),
-        const SizedBox(height: 4),
-
-        // 3. Botón de Reseña
-        SizedBox(
-          height: 20,
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const resenaNueva()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-            ),
-            child: const Text("Reseña", style: TextStyle(fontSize: 10)),
-          ),
-        ),
-      ],
     );
   }
 }

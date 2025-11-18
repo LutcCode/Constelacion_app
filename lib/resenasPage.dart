@@ -32,14 +32,13 @@ class _ResenasPageState extends State<ResenasPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al cargar las clases')),
+          const SnackBar(content: Text('Error al cargar las reseñas')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')),
-      );
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
     setState(() {
       isLoading = false;
@@ -48,14 +47,12 @@ class _ResenasPageState extends State<ResenasPage> {
 
   Widget _gridResenas() {
     if (resenas.isEmpty) {
-      return const Center(
-        child: Text('No hay reseñas disponibles'),
-      );
+      return const Center(child: Text('No hay reseñas disponibles'));
     }
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: 2,
         crossAxisSpacing: 10.0,
         mainAxisSpacing: 10.0,
         childAspectRatio: 0.65,
@@ -67,7 +64,8 @@ class _ResenasPageState extends State<ResenasPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => resenaPage(idResena: resena.id_libro),
+              MaterialPageRoute(
+                builder: (context) => resenaPage(idResena: resena.id_libro),
               ),
             );
           },
@@ -78,14 +76,27 @@ class _ResenasPageState extends State<ResenasPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: resena.imagen.isNotEmpty
-                      ? Image.network(
-                    resena.imagen,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Center(child: Icon(Icons.book, size: 40, color: Colors.grey)),
-                  )
-                      : const Center(child: Icon(Icons.book, size: 40, color: Colors.grey)),
+                  child:
+                      resena.imagen.isNotEmpty
+                          ? Image.network(
+                            resena.imagen,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => const Center(
+                                  child: Icon(
+                                    Icons.book,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                          )
+                          : const Center(
+                            child: Icon(
+                              Icons.book,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                          ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -94,8 +105,10 @@ class _ResenasPageState extends State<ResenasPage> {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
+
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -113,15 +126,14 @@ class _ResenasPageState extends State<ResenasPage> {
     cargarResenas();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: const Text('Resenas')),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _gridResenas(),
+      appBar: AppBar(title: const Text('Resenas')),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _gridResenas(),
     );
   }
 }

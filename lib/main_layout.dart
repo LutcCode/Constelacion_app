@@ -1,15 +1,8 @@
 import 'package:constelacion/PerfilPage.dart';
-import 'package:constelacion/categoriaPage.dart';
 import 'package:constelacion/libreriaPage.dart';
-import 'package:constelacion/resenaNueva.dart';
-import 'package:constelacion/resenaPage.dart';
 import 'package:constelacion/resenasPage.dart';
 import 'package:flutter/material.dart';
-import 'package:constelacion/resenaNueva.dart';
-import 'package:constelacion/foro_screen.dart';
-import 'package:constelacion/loginPage.dart';
 import 'package:constelacion/theme/app_strings.dart';
-import 'package:constelacion/libreriaNuevo.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -24,7 +17,7 @@ class _MainLayoutState extends State<MainLayout> {
   final List<Widget> _screens = [
     const ResenasPage(),
     const LibreriaPage(),
-    const PerfilPage(nombre: "ulises", usuario: "Vampirecell")
+    const PerfilPage()
   ];
 
   void _onTabTapped(int index) {

@@ -40,20 +40,14 @@ class _loginPageState extends State<loginPage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
-
       Map<String, dynamic> responseJson = jsonDecode(response.body);
       final persona = LectorModel.fromJson(responseJson);
-
       Ambiente.idUser = persona.id;
     }
-
     Map<String, dynamic> responseJson = jsonDecode(response.body);
     final loginResponse = LoginResponse.fromJson(responseJson);
-
-
     if (loginResponse.acceso == 'Ok') {
       Ambiente.idUser = loginResponse.idUsuario;
-
       QuickAlert.show(
         context: context,
         type: QuickAlertType.success,

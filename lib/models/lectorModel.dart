@@ -7,7 +7,7 @@ class LectorModel {
   final String apm_lector;
   final int edad;
   final String fecha_nacimiento;
-  final String suscripcion;
+  final bool suscripcion;
 
 
   LectorModel({
@@ -22,17 +22,14 @@ class LectorModel {
     required this.suscripcion,
   });
 
-  factory LectorModel.fromJson(Map<String, dynamic> json) {
-    return LectorModel(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      password: json['password'] ?? '',
-      app_lector: json['app'] ?? '',
-      apm_lector: json['apm'] ?? '',
-      edad: json['edad'] ?? 0,
-      fecha_nacimiento: json['direccion'] ?? '',
-      suscripcion: json['suscripcion'] ?? '',
-    );
-  }
+  LectorModel.fromJson(Map<String, dynamic> json)
+      : id = json['id'] ?? 0,
+      name= json['name'] ?? '',
+      email= json['email'] ?? '',
+      password= json['password'] ?? '',
+      app_lector= json['app_lector'] ?? '',
+      apm_lector= json['apm_lector'] ?? '',
+      edad= json['edad'] ?? 0,
+      fecha_nacimiento= json['direccion'] ?? '',
+      suscripcion= json['suscripcion'] ?? '';
 }
