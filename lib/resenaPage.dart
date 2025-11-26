@@ -71,10 +71,8 @@ class _resenaPageState extends State<resenaPage> {
               : SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           flex: 1,
@@ -110,8 +108,7 @@ class _resenaPageState extends State<resenaPage> {
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   txtTitulo.text,
-                                  // 6. Se centra el texto
-                                  textAlign: TextAlign.center,
+                                  textAlign: TextAlign.start,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
@@ -134,32 +131,41 @@ class _resenaPageState extends State<resenaPage> {
                         ),
                       ],
                     ),
-
-                    // 7. Se añade un divisor y espaciado para separar secciones
                     const SizedBox(height: 24),
                     const Divider(),
                     const SizedBox(height: 16),
-
-                    // 8. Se añade Padding y se centra el texto de la descripción
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        "Acerca de ${txtTitulo.text}",
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Text(
                         txtDescripcion.text,
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.start,
                         style: const TextStyle(fontSize: 15),
                       ),
                     ),
-
                     const SizedBox(height: 24),
                     const Divider(),
                     const SizedBox(height: 16),
-
-                    // 9. Se añade Padding y se centra el texto de la reseña
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        "Reseña",
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Text(
                         txtResena.text,
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.start,
                         style: const TextStyle(fontSize: 15),
                       ),
                     ),
