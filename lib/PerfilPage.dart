@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:constelacion/perfilEditar.dart';
 import 'package:constelacion/resenaPage.dart';
 import 'package:http/http.dart' as http;
-import 'models/LibroModel.dart';
+import 'models/LibroModelLibreria.dart';
 import 'models/ambiente.dart';
 import 'models/lectorModel.dart';
 
@@ -18,7 +18,7 @@ class _PerfilPageState extends State<PerfilPage> {
   final PageController _pageController = PageController();
   int _selectedPage = 0;
 
-  List<LibroModel> libros = [];
+  List<LibroModelLibreria> libros = [];
   final TextEditingController txtNombre = TextEditingController();
   bool isLoading = true;
 
@@ -87,8 +87,8 @@ class _PerfilPageState extends State<PerfilPage> {
       );
       if (response.statusCode == 200) {
         Iterable responseJson = jsonDecode(response.body);
-        libros = List<LibroModel>.from(
-          responseJson.map((model) => LibroModel.fromJson(model)),
+        libros = List<LibroModelLibreria>.from(
+          responseJson.map((model) => LibroModelLibreria.fromJson(model)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

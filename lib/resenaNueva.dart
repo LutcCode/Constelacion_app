@@ -9,7 +9,9 @@ import 'package:constelacion/theme/app_strings.dart';
 
 class resenaNueva extends StatefulWidget {
   final int idResena;
-  const resenaNueva({super.key, required this.idResena});
+  final int? idLibro;
+
+  const resenaNueva({super.key, required this.idResena, this.idLibro});
 
   @override
   State<resenaNueva> createState() => _resenaNuevaState();
@@ -18,7 +20,7 @@ class resenaNueva extends StatefulWidget {
 class _resenaNuevaState extends State<resenaNueva> {
   List<ResenaModel> resena = [];
   bool isLoading = true;
-  int? idLibro;
+  int? IdResena;
 
   final TextEditingController txtAcerca = TextEditingController();
   final TextEditingController txtResena = TextEditingController();
@@ -39,7 +41,7 @@ class _resenaNuevaState extends State<resenaNueva> {
         setState(() {
           txtAcerca.text = resena.descripcion ?? '';
           txtResena.text = resena.resena ?? '';
-          idLibro = resena.id_libro;
+          IdResena = resena.id;
         });
       } else {
         ScaffoldMessenger.of(
@@ -50,7 +52,7 @@ class _resenaNuevaState extends State<resenaNueva> {
       print(e);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ).showSnackBar(SnackBar(content: Text('Error 1: ${e.toString()}')));
     } finally {
       setState(() => isLoading = false);
     }
@@ -68,8 +70,8 @@ class _resenaNuevaState extends State<resenaNueva> {
       final response = await http.post(
         Uri.parse('${Ambiente.urlServer}/api/resena/new'),
         body: jsonEncode(<String, dynamic>{
-          'id': widget.idResena,
-          'id_libro': idLibro,
+          'id': IdResena,
+          'id_libro': widget.idLibro,
           'descripcion': txtAcerca.text,
           'resena': txtResena.text,
         }),
@@ -89,7 +91,7 @@ class _resenaNuevaState extends State<resenaNueva> {
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ).showSnackBar(SnackBar(content: Text('Error 2: ${e.toString()}')));
     } finally {
       setState(() => isLoading = false);
     }
@@ -106,7 +108,7 @@ class _resenaNuevaState extends State<resenaNueva> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Mi reseña - ID: ${widget.idResena}")),
+      appBar: AppBar(title: Text("Mi reseña - ID: ${widget.idLibro}")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

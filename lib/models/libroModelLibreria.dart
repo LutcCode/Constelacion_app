@@ -1,7 +1,7 @@
-class LibroModel {
+class LibroModelLibreria {
 
-  final int? id;
-  final int? id_categoria;
+  final int id;
+  final int id_resena;
   final int? id_editorial;
   final int? id_tipo_libro;
   final int? id_modo_lectura;
@@ -19,10 +19,10 @@ class LibroModel {
   final String modoLectura;
   final String fraseFavorita;
 
-  LibroModel({
+  LibroModelLibreria({
 
-    this.id,
-    this.id_categoria,
+    required this.id,
+    required this.id_resena,
     this.id_editorial,
     this.id_tipo_libro,
     this.id_modo_lectura,
@@ -41,9 +41,9 @@ class LibroModel {
     required this.fraseFavorita,
   });
 
-  LibroModel.fromJson(Map<String, dynamic> json)
+  LibroModelLibreria.fromJson(Map<String, dynamic> json)
       : id = json['id'],
-        id_categoria = json['id_categoria'],
+        id_resena = json['id_resena'] ?? 0,
         id_editorial = json['id_editorial'],
         id_lector = json['id_lector'],
         id_tipo_libro = json['id_tipo_libro'],

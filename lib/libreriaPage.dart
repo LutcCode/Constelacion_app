@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:constelacion/libroNuevo.dart';
+import 'package:constelacion/libreriaNuevo.dart';
 import 'package:constelacion/resenaNueva.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:constelacion/models/ambiente.dart';
-import 'package:constelacion/models/LibroModel.dart';
+import 'package:constelacion/models/LibroModelLibreria.dart';
 import 'package:constelacion/theme/app_strings.dart';
 
 class LibreriaPage extends StatefulWidget {
@@ -15,7 +15,7 @@ class LibreriaPage extends StatefulWidget {
 }
 
 class _LibreriaPageState extends State<LibreriaPage> {
-  List<LibroModel> libros = [];
+  List<LibroModelLibreria> libros = [];
   bool isLoading = true;
 
   Future<void> CargarLibros() async {
@@ -29,8 +29,8 @@ class _LibreriaPageState extends State<LibreriaPage> {
       );
       if (response.statusCode == 200) {
         Iterable responseJson = jsonDecode(response.body);
-        libros = List<LibroModel>.from(
-          responseJson.map((model) => LibroModel.fromJson(model)),
+        libros = List<LibroModelLibreria>.from(
+          responseJson.map((model) => LibroModelLibreria.fromJson(model)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +115,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => resenaNueva(idResena: libro.id),
+                              builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
                             ),
                           );
                         },
@@ -126,7 +126,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => resenaNueva(idResena: libro.id),
+                              builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
                             ),
                           );
                         },
@@ -137,7 +137,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => resenaNueva(idResena: libro.id_resena),
+                              builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
                             ),
                           );
                         },
@@ -170,7 +170,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const LibroNuevo()),
+            MaterialPageRoute(builder: (context) => const libreriaNuevo()),
           );
         },
         child: const Icon(Icons.add),

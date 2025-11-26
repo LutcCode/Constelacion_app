@@ -19,8 +19,8 @@ class _ResenasPageState extends State<ResenasPage> {
   Future<void> cargarResenas() async {
     try {
       final response = await http.post(
-        Uri.parse('${Ambiente.urlServer}/api/libros/lector/completo'),
-        body: jsonEncode(<String, dynamic>{'id_lector': Ambiente.idUser}),
+        Uri.parse('${Ambiente.urlServer}/api/libros/resenas'),
+        body: jsonEncode(<String, dynamic>{}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
