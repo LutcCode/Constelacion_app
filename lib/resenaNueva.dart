@@ -97,6 +97,40 @@ class _resenaNuevaState extends State<resenaNueva> {
     }
   }
 
+  Future<void> EliminarResena() async {
+    if (IdResena == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se ha creado una reseña')),
+      );
+      return;
+    }
+    setState(() => isLoading = true);
+    try {
+      final response = await http.post(
+        Uri.parse('${Ambiente.urlServer}/api/resena/delete'),
+        body: jsonEncode(<String, dynamic>{'id': IdResena}),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      );
+      if (response.body == "ok") {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MainLayout()),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al guardar la reseña')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error 2: ${e.toString()}')));
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -144,6 +178,22 @@ class _resenaNuevaState extends State<resenaNueva> {
               ),
               child: const Text("Publicar"),
             ),
+            if (widget.idResena != 0) ...[
+              const SizedBox(height: 10), // Un poco de espacio entre botones
+              ElevatedButton(
+                onPressed: EliminarResena,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor:
+                      Colors.redAccent, // Color rojo para indicar eliminación
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+                child: const Text("Eliminar"),
+              ),
+            ],
           ],
         ),
       ),

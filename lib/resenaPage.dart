@@ -122,7 +122,9 @@ class _resenaPageState extends State<resenaPage> {
                                 txtAutor.text,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.normal, // Se quita el bold para diferenciarlo del título
+                                  fontWeight:
+                                      FontWeight
+                                          .normal, // Se quita el bold para diferenciarlo del título
                                   fontSize: 16,
                                   fontStyle: FontStyle.italic,
                                 ),
@@ -163,7 +165,7 @@ class _resenaPageState extends State<resenaPage> {
                     ),
                   ],
                 ),
-          ),
+              ),
     );
   }
 }

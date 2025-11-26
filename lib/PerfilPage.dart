@@ -19,6 +19,7 @@ class _PerfilPageState extends State<PerfilPage> {
   int _selectedPage = 0;
 
   List<LibroModelLibreria> libros = [];
+  List<LibroModelLibreria> librosResenas = [];
   final TextEditingController txtNombre = TextEditingController();
   bool isLoading = true;
 
@@ -105,6 +106,35 @@ class _PerfilPageState extends State<PerfilPage> {
     });
   }
 
+  Future<void> CargarLibrosResenas() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Ambiente.urlServer}/api/libros/lector/resenas'),
+        body: jsonEncode(<String, dynamic>{'id_lector': Ambiente.idUser}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        Iterable responseJson = jsonDecode(response.body);
+        librosResenas = List<LibroModelLibreria>.from(
+          responseJson.map((model) => LibroModelLibreria.fromJson(model)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al cargar los libros')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   Widget _gridLibros() {
     if (libros.isEmpty) {
       return const Center(child: Text('No hay libros disponibles'));
@@ -145,19 +175,6 @@ class _PerfilPageState extends State<PerfilPage> {
                           child: Icon(Icons.book, size: 40, color: Colors.grey),
                         ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  libro.nombre_libro,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
             ],
           ),
         );
@@ -165,11 +182,104 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
+  Widget _gridResenas() {
+    if (librosResenas.isEmpty) {
+      return const Center(child: Text('No hay libros disponibles'));
+    }
+    return GridView.builder(
+      padding: const EdgeInsets.all(10.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 1,
+        crossAxisSpacing: 10.0,
+        mainAxisSpacing: 10.0,
+        childAspectRatio: 1.5,
+      ),
+      itemCount: librosResenas.length,
+      itemBuilder: (context, index) {
+        final libroResena = librosResenas[index];
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          elevation: 3.0,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => resenaPage(idResena: libroResena.id),
+                ),
+              );
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 80,
+                  height: double.infinity,
+                  child: libroResena.imagen.isNotEmpty
+                      ? Image.network(
+                    libroResena.imagen,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Center(
+                      child: Icon(
+                        Icons.book,
+                        size: 30,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                      : const Center(
+                    child: Icon(Icons.book, size: 30, color: Colors.grey),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          libroResena.nombre_libro,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          libroResena.id_resena.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+
   @override
   void initState() {
     super.initState();
     cargarLector();
     CargarLibros();
+    CargarLibrosResenas();
   }
 
   @override
@@ -189,51 +299,76 @@ class _PerfilPageState extends State<PerfilPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage("images/icono1.png"),
-            backgroundColor: Colors.grey[200],
-            onBackgroundImageError: (exception, stackTrace) {
-              print('Error al cargar la imagen local: $exception');
-            },
-          ),
-          Text(txtNombre.text),
-          Text("Vampirecell"),
-          TextButton(
-            onPressed: _mostrarAlertaCorona,
-            child: const Text('Corona'),
-          ),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child:
-                        isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : _gridLibros(),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  const SizedBox(height: 20),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage("images/icono1.png"),
+                    backgroundColor: Colors.grey[200],
+                    onBackgroundImageError: (exception, stackTrace) {
+                      print('Error al cargar la imagen local: $exception');
+                    },
                   ),
-                ),
-
-                const VerticalDivider(width: 2, color: Colors.grey),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    child:
-                    isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _gridLibros(),
+                  Text(txtNombre.text),
+                  TextButton(
+                    onPressed: _mostrarAlertaCorona,
+                    child: const Text('Corona'),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+                  const Divider(
+                    color: Colors.grey,
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  "Lista de Lecturas",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              const Divider(
+                                indent: 20,
+                                endIndent: 20,
+                              ),
+                              Expanded(child: _gridLibros()),
+                            ],
+                          ),
+                        ),
+                        const VerticalDivider(width: 1, color: Colors.grey),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  "Reseñas",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              const Divider(
+                                indent: 20,
+                                endIndent: 20,
+                              ),
+                              Expanded(child: _gridResenas()),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
     );
   }
 }
