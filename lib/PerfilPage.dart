@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:constelacion/theme/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:constelacion/perfilEditar.dart';
 import 'package:constelacion/resenaPage.dart';
@@ -6,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'models/LibroModelLibreria.dart';
 import 'models/ambiente.dart';
 import 'models/lectorModel.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
@@ -215,22 +217,27 @@ class _PerfilPageState extends State<PerfilPage> {
                 SizedBox(
                   width: 80,
                   height: double.infinity,
-                  child: libroResena.imagen.isNotEmpty
-                      ? Image.network(
-                    libroResena.imagen,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Center(
-                      child: Icon(
-                        Icons.book,
-                        size: 30,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
-                      : const Center(
-                    child: Icon(Icons.book, size: 30, color: Colors.grey),
-                  ),
+                  child:
+                      libroResena.imagen.isNotEmpty
+                          ? Image.network(
+                            libroResena.imagen,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => const Center(
+                                  child: Icon(
+                                    Icons.book,
+                                    size: 30,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                          )
+                          : const Center(
+                            child: Icon(
+                              Icons.book,
+                              size: 30,
+                              color: Colors.grey,
+                            ),
+                          ),
                 ),
                 Expanded(
                   child: Padding(
@@ -272,8 +279,6 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -286,7 +291,7 @@ class _PerfilPageState extends State<PerfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil'),
+        title: const Text(AppStrings.perfil),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -313,10 +318,40 @@ class _PerfilPageState extends State<PerfilPage> {
                       print('Error al cargar la imagen local: $exception');
                     },
                   ),
+                  const SizedBox(height: 10),
                   Text(txtNombre.text),
-                  TextButton(
-                    onPressed: _mostrarAlertaCorona,
-                    child: const Text('Corona'),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _mostrarAlertaCorona,
+                        icon: const FaIcon(
+                          FontAwesomeIcons.crown,
+                          color: Colors.amber,
+                          size: 20,
+                        ),
+                        label: const Text(
+                          AppStrings.premiun,
+                          style: TextStyle(color: Colors.amber),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      TextButton.icon(
+                        onPressed: () {
+                          Ambiente.idUser = 0;
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/',
+                            (Route<dynamic> route) => false,
+                          );
+                        },
+                        icon: const Icon(Icons.logout, color: Colors.red),
+                        label: const Text(
+                          AppStrings.cerrarSesion,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
                   ),
                   const Divider(
                     color: Colors.grey,
@@ -337,10 +372,7 @@ class _PerfilPageState extends State<PerfilPage> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              const Divider(
-                                indent: 20,
-                                endIndent: 20,
-                              ),
+                              const Divider(indent: 20, endIndent: 20),
                               Expanded(child: _gridLibros()),
                             ],
                           ),
@@ -356,10 +388,7 @@ class _PerfilPageState extends State<PerfilPage> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              const Divider(
-                                indent: 20,
-                                endIndent: 20,
-                              ),
+                              const Divider(indent: 20, endIndent: 20),
                               Expanded(child: _gridResenas()),
                             ],
                           ),

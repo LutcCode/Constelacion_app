@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:constelacion/theme/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'models/ambiente.dart';
@@ -73,7 +74,7 @@ class _perfilEditarState extends State<perfilEditar> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const MainLayout()),
-              (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -97,53 +98,82 @@ class _perfilEditarState extends State<perfilEditar> {
 
   @override
   Widget build(BuildContext context) {
+    final double fieldWidth = MediaQuery.of(context).size.width * (2 / 3);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
-      body: Column(
-        children: [
-          const SizedBox(height: 20), // Un poco de espacio arriba
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage("images/icono1.png"),
-            backgroundColor: Colors.grey[200],
-            onBackgroundImageError: (exception, stackTrace) {
-              print('Error al cargar la imagen local: $exception');
-            },
-          ),
-          TextField(
-            controller: txtNombre,
-            decoration: const InputDecoration(
-              labelText: "Nombre(s)",
-              border: OutlineInputBorder(),
-            ),
-          ),
-          TextField(
-            controller: txtApp,
-            decoration: const InputDecoration(
-              labelText: "Apellido Paterno",
-              border: OutlineInputBorder(),
-            ),
-          ),
-          TextField(
-            controller: txtApm,
-            decoration: const InputDecoration(
-              labelText: "Apellido Materno",
-              border: OutlineInputBorder(),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: EnviarPerfil,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+      appBar: AppBar(title: const Text(AppStrings.editarPerfil)),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              //const SizedBox(height: 10),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: const AssetImage("images/icono1.png"),
+                backgroundColor: Colors.grey[200],
+                onBackgroundImageError: (exception, stackTrace) {
+                  print('Error al cargar la imagen local: $exception');
+                },
               ),
-              backgroundColor: Colors.blueAccent,
-              textStyle: const TextStyle(fontSize: 18),
-            ),
-            child: const Text("Guardar"),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtNombre,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.nombre,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.nombre,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtApp,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.app,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.app,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtApm,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.apm,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.apm,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: ElevatedButton(
+                  onPressed: EnviarPerfil,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 18),
+                  ),
+                  child: const Text(AppStrings.guardar),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
