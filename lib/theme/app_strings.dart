@@ -30,6 +30,7 @@ class AppStrings {
   static const String nombre = "Nombre(s)";
   static const String app = "Apellido Paterno";
   static const String apm = "Apellido Materno";
+  static const String edad = "Edad";
   static const String usuario = "Usuario";
   static const String fechaNacimiento = "Fecha de nacimiento";
   static const String registrar = "Registrar";

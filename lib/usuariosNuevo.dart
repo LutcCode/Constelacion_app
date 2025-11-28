@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:constelacion/loginPage.dart';
+import 'package:constelacion/theme/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:constelacion/models/ambiente.dart';
@@ -34,13 +35,12 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
         'fecha_nacimiento': txtFechaNacimiento.text,
         'email': txtEmail.text,
         'password': txtPassword.text,
-        'suscripcion': false
+        'suscripcion': false,
       }),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
     if (response.body == 'ok') {
       QuickAlert.show(
         context: context,
@@ -49,64 +49,143 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
         confirmBtnText: 'Continuar',
         onConfirmBtnTap: () {
           Navigator.pop(context);
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(
-              builder: (context) => const loginPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const loginPage()),
+            (route) => false,
           );
         },
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al guardar lector')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Error al guardar lector')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final double fieldWidth = MediaQuery.of(context).size.width * (2 / 3);
     return Scaffold(
-      backgroundColor: const Color(0xFFECEFF1),
-      appBar: AppBar(
-        title: const Text('Registro'),
-        backgroundColor: const Color(0xFF9FC5D6),
-      ),
-      body: ListView(
-        children: [
-          SizedBox(
-            height: 150,
-            child: Image.network(
-              '',
-              fit: BoxFit.contain,
-            ),
+      appBar: AppBar(title: const Text(AppStrings.registro)),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtName,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.nombre,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.nombre,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtAppLector,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.app,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.app,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtApmLector,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.apm,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.apm,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtEdad,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.edad,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.edad,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtFechaNacimiento,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.fechaNacimiento,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.fechaNacimiento,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtEmail,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.correo,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.correo,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: TextFormField(
+                  controller: txtPassword,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.contrasena,
+                    border: OutlineInputBorder(),
+                    hintText: AppStrings.contrasena,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              SizedBox(
+                width: fieldWidth,
+                child: ElevatedButton(
+                  onPressed: guardarLector,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
+                  child: const Text(AppStrings.registrar),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-
-          _campoTexto('Nombre:', txtName),
-          _campoTexto('Apellido Paterno:', txtAppLector),
-          _campoTexto('Apellido Materno:', txtApmLector),
-          _campoTexto('Edad:', txtEdad, tipo: TextInputType.number),
-          _campoTexto('Fecha de Nacimiento:', txtFechaNacimiento),
-          _campoTexto('Email:', txtEmail),
-          _campoTexto('Contraseña:', txtPassword, ocultar: true),
-
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: guardarLector,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF9FC5D6),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-            child: const Text('Registrar', style: TextStyle(fontSize: 18)),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _campoTexto(String label, TextEditingController controller,
-      {TextInputType tipo = TextInputType.text, bool ocultar = false}) {
+  Widget _campoTexto(
+    String label,
+    TextEditingController controller, {
+    TextInputType tipo = TextInputType.text,
+    bool ocultar = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
       child: Column(

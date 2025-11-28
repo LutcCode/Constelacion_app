@@ -99,7 +99,6 @@ class _perfilEditarState extends State<perfilEditar> {
   @override
   Widget build(BuildContext context) {
     final double fieldWidth = MediaQuery.of(context).size.width * (2 / 3);
-
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.editarPerfil)),
       body: Center(
