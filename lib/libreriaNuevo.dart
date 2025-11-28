@@ -18,6 +18,9 @@ class libreriaNuevo extends StatefulWidget {
 }
 
 class _libreriaNuevoState extends State<libreriaNuevo> {
+  // CLAVE: GlobalKey para el formulario
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   // Estado de carga para la edición
   bool _isFetching = false;
 
@@ -31,8 +34,8 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
   final TextEditingController _fraseFavoritaController = TextEditingController();
 
   // Opciones de Selección
-  String _selectedBookType = AppStrings.tipoLibroFisico;
-  String _selectedStoryType = AppStrings.autoconclusivo;
+  String _selectedBookType = AppStrings.tipoLibroFisico; // Valor por defecto
+  String _selectedStoryType = AppStrings.autoconclusivo; // Valor por defecto
   String? _selectedGenre;
 
   // Géneros (Simulación para un Dropdown)
@@ -41,6 +44,11 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
     AppStrings.generoAmor,
     AppStrings.generoFantasia,
     AppStrings.generoMisterio,
+  ];
+
+  // Lista de modos de lectura válidos (para validación)
+  final List<String> _storyModes = [
+    AppStrings.autoconclusivo, AppStrings.saga, AppStrings.bilogia, AppStrings.trilogia
   ];
 
   // Fecha
@@ -99,7 +107,6 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
 
     try {
       final response = await http.post(
-        // Endpoint que ya tienes definido en tu API: /api/libro
         Uri.parse('${Ambiente.urlServer}/api/libro'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(<String, dynamic>{'id': idLibro}),
@@ -107,23 +114,25 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
 
       if (response.statusCode == 200) {
         final responseJson = jsonDecode(response.body);
-
-        // Tu endpoint show devuelve una lista, tomamos el primer elemento
         final data = responseJson.isNotEmpty ? responseJson[0] : null;
 
         if (data != null) {
-          // Asumiendo que LibroModel tiene un constructor fromJson compatible
           final libro = LibroModel.fromJson(data);
 
-          // --- LÓGICA DE CORRECCIÓN DE DROPDOWN AÑADIDA ---
-          String loadedGenre = libro.genero ?? _genres.first;
+          // --- LÓGICA DE CORRECCIÓN DE RADIOS Y DROPDOWN ---
 
-          // CRÍTICO: Si el valor cargado no está en nuestra lista de opciones (_genres),
-          // usamos el primer elemento de la lista para evitar el error de aserción (zero items).
+          // Género (Dropdown): Usar valor cargado o primer valor si no existe en lista local
+          String loadedGenre = libro.genero ?? _genres.first;
           if (!_genres.contains(loadedGenre)) {
             loadedGenre = _genres.first;
           }
-          // --- FIN DE LÓGICA DE CORRECCIÓN ---
+
+          // Tipo de Libro (Radio 1): Cargar solo si es un valor conocido
+          String loadedBookType = libro.tipoLibro ?? AppStrings.tipoLibroFisico;
+
+          // Modo de Lectura (Radio 2): Cargar solo si es un valor conocido
+          String loadedStoryType = libro.modoLectura ?? AppStrings.autoconclusivo;
+
 
           setState(() {
             // Rellenar controladores
@@ -135,10 +144,21 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
             _linkController.text = libro.imagen ?? '';
             _fraseFavoritaController.text = libro.fraseFavorita ?? '';
 
-            // Rellenar selectores usando el valor seguro
-            _selectedGenre = loadedGenre; // <-- Usamos el valor verificado
-            _selectedBookType = libro.tipoLibro ?? AppStrings.tipoLibroFisico;
-            _selectedStoryType = libro.modoLectura ?? AppStrings.autoconclusivo;
+            // Rellenar selectores
+            _selectedGenre = loadedGenre;
+
+            // CORRECCIÓN PARA RADIOS: Solo actualiza si el valor de la DB coincide con una opción local.
+            if (loadedBookType == AppStrings.tipoLibroFisico || loadedBookType == AppStrings.tipoLibroDigital) {
+              _selectedBookType = loadedBookType;
+            } else {
+              _selectedBookType = AppStrings.tipoLibroFisico; // Valor por defecto seguro
+            }
+
+            if (_storyModes.contains(loadedStoryType)) {
+              _selectedStoryType = loadedStoryType;
+            } else {
+              _selectedStoryType = AppStrings.autoconclusivo; // Valor por defecto seguro
+            }
 
             // Rellenar fecha
             if (libro.fecha_publicacion != null) {
@@ -164,16 +184,28 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
   // FUNCIÓN DE GUARDADO (CREAR/ACTUALIZAR)
   // -----------------------------------------------------------------
   Future<void> _saveBook() async {
-    // 1. Validaciones básicas
-    if (_tituloController.text.isEmpty || _autorController.text.isEmpty || _selectedGenre == null || _fechaPublicacion == null) {
+    // CLAVE: 1. Validar campos de texto (TextFormField)
+    if (!_formKey.currentState!.validate()) {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.warning,
+        title: 'Faltan Campos',
+        text: 'Por favor, rellena todos los campos obligatorios del formulario.',
+      );
+      return;
+    }
+
+    // 2. Validar Dropdown y Fecha (no validados por FormKey)
+    if (_selectedGenre == null || _fechaPublicacion == null) {
       QuickAlert.show(
         context: context,
         type: QuickAlertType.error,
         title: 'Error de Formulario',
-        text: 'Por favor, completa el título, autor, género y fecha de publicación.',
+        text: 'Por favor, selecciona el género y la fecha de publicación.',
       );
       return;
     }
+
 
     // Determinar si es nueva creación (id=0) o edición (id=widget.idLibro)
     final int bookId = widget.idLibro ?? 0;
@@ -183,26 +215,25 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
         ? '${Ambiente.urlServer}/api/libro/new'
         : '${Ambiente.urlServer}/api/libro/update';
 
-    // 2. Crear el objeto Modelo con los datos del formulario
+    // 3. Crear el objeto Modelo con los datos del formulario
     final bookData = {
-      // Si estamos actualizando, enviamos el ID. Si es nuevo, enviamos 0.
       'id': bookId,
       'id_lector': Ambiente.idUser,
       'nombre_libro': _tituloController.text,
       'autor': _autorController.text,
       'no_paginas': _paginasController.text.isNotEmpty ? _paginasController.text : '0',
       'genero': _selectedGenre!,
-      'tipo_libro': _selectedBookType, // Usamos el nombre de columna correcto: tipo_libro
-      'modo_lectura': _selectedStoryType, // Usamos el nombre de columna correcto: modo_lectura
+      'tipo_libro': _selectedBookType,
+      'modo_lectura': _selectedStoryType,
       'fecha_publicacion': _fechaPublicacion!.toIso8601String().split('T')[0],
       'imagen': _linkController.text,
       'personaje_favorito': _personajeFavController.text,
       'personaje_odiado': _personajeOdiadoController.text,
-      'frase_favorita': _fraseFavoritaController.text, // Usamos el nombre de columna correcto: frase_favorita
+      'frase_favorita': _fraseFavoritaController.text,
     };
 
 
-    // 3. Petición HTTP POST a Laravel
+    // 4. Petición HTTP POST a Laravel
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -210,7 +241,7 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
         body: jsonEncode(bookData),
       );
 
-      // 4. Manejar la respuesta
+      // 5. Manejar la respuesta
       if (response.statusCode == 200) {
         QuickAlert.show(
           context: context,
@@ -222,11 +253,12 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
           },
         );
       }else {
+        // Fallo del servidor (Error 500/422)
         QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
           title: 'Error del Servidor',
-          text: 'Fallo al guardar el libro. Código: ${response.statusCode}.',
+          text: 'Fallo al guardar el libro. Código: ${response.statusCode}. Revisa el log.',
         );
         print('JSON ENVIADO: ${jsonEncode(bookData)}');
         print('Respuesta de Laravel: ${response.body}');
@@ -236,7 +268,7 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
         context: context,
         type: QuickAlertType.error,
         title: 'Error de Conexión',
-        text: 'No se pudo conectar al servidor. Asegúrate de que Laravel esté corriendo. ($e)',
+        text: 'No se pudo conectar al servidor. ($e)',
       );
     }
   }
@@ -260,67 +292,95 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
           ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent)) // Muestra carga al buscar datos
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildTextField(_tituloController, AppStrings.titulo),
-                      _buildTextField(_autorController, AppStrings.autor),
-                      _buildDateButton(context),
-                    ],
+        // CLAVE: Envuelve el contenido en un Form
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        // Usamos TextFormField con validación obligatoria
+                        _buildValidatedTextField(_tituloController, AppStrings.titulo),
+                        _buildValidatedTextField(_autorController, AppStrings.autor),
+                        _buildDateButton(context),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                _buildImageContainer(),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildTextField(_paginasController, AppStrings.noPaginasa, keyboardType: TextInputType.number),
-                      _buildGenreDropdown(),
-                      _buildTextField(_personajeFavController, AppStrings.personajeFav),
-                      _buildTextField(_personajeOdiadoController, AppStrings.personajeOdiado),
-                    ],
+                  const SizedBox(width: 16),
+                  _buildImageContainer(),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        // Campo no obligatorio usa TextField
+                        _buildTextField(_paginasController, AppStrings.noPaginasa, keyboardType: TextInputType.number),
+                        _buildGenreDropdown(),
+                        _buildTextField(_personajeFavController, AppStrings.personajeFav),
+                        _buildTextField(_personajeOdiadoController, AppStrings.personajeOdiado),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildBookTypeSelector(),
-                      const SizedBox(height: 16),
-                      _buildStoryTypeSelector(),
-                      _buildTextField(_linkController, 'LINK DE LA IMAGEN'),
-                      const SizedBox(height: 16),
-                    ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildBookTypeSelector(),
+                        const SizedBox(height: 16),
+                        _buildStoryTypeSelector(),
+                        _buildTextField(_linkController, 'LINK DE LA IMAGEN'),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+                ],
+              ),
+              const SizedBox(height: 24),
 
-            const Text(AppStrings.clasificacion, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 24),
+              const Text(AppStrings.clasificacion, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
 
-            _buildFavoritePhraseField(),
-          ],
+              _buildFavoritePhraseField(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // WIDGETS AUXILIARES (sin cambios)
+  // WIDGETS AUXILIARES MODIFICADOS
 
+  // Nuevo widget para campos obligatorios (TextFormField con validador)
+  Widget _buildValidatedTextField(TextEditingController controller, String label, {TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField( // Usamos TextFormField
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Este campo es obligatorio'; // Mensaje de error visible
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  // Widget para campos opcionales (TextField original)
   Widget _buildTextField(TextEditingController controller, String label, {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -334,6 +394,7 @@ class _libreriaNuevoState extends State<libreriaNuevo> {
       ),
     );
   }
+
 
   Widget _buildDateButton(BuildContext context) {
     return Padding(
