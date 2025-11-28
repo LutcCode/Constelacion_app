@@ -63,90 +63,95 @@ class _LibreriaPageState extends State<LibreriaPage> {
       itemBuilder: (context, index) {
         final libro = libros[index];
         return Card(
-            clipBehavior: Clip.antiAlias,
-            elevation: 3.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child:
-                      libro.imagen.isNotEmpty
-                          ? Image.network(
-                            libro.imagen,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) => const Center(
-                                  child: Icon(
-                                    Icons.book,
-                                    size: 40,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                          )
-                          : const Center(
-                            child: Icon(
-                              Icons.book,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                          ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    libro.nombre_libro,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+          clipBehavior: Clip.antiAlias,
+          elevation: 3.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child:
+                libro.imagen.isNotEmpty
+                    ? Image.network(
+                  libro.imagen,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) => const Center(
+                    child: Icon(
+                      Icons.book,
+                      size: 40,
+                      color: Colors.grey,
                     ),
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+                    : const Center(
+                  child: Icon(
+                    Icons.book,
+                    size: 40,
+                    color: Colors.grey,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.rate_review, size: 20),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 20),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
-                            ),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.visibility, size: 20),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  libro.nombre_libro,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.rate_review, size: 20),
+                      onPressed: () {
+                        // Botón para editar reseña
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit, size: 20),
+                      onPressed: () async {
+                        // ACCIÓN CRÍTICA: Navega a libreriaNuevo enviando el ID del libro para edición.
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => libreriaNuevo(idLibro: libro.id), // <-- Enviamos el ID del libro
+                          ),
+                        );
+                        // Recarga la lista después de editar
+                        CargarLibros();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.visibility, size: 20),
+                      onPressed: () {
+                        // Botón de Ver Reseña
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -163,15 +168,17 @@ class _LibreriaPageState extends State<LibreriaPage> {
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.libreria)),
       body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _gridLibros(),
+      isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _gridLibros(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const libreriaNuevo()),
           );
+          // Recarga la lista después de añadir un nuevo libro
+          CargarLibros();
         },
         child: const Icon(Icons.add),
       ),
