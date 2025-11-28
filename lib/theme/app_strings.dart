@@ -8,11 +8,14 @@ class AppStrings {
 
   static const String navResenias = "Reseñas";
   static const String navPerfil = "Perfil";
+
 // Pagina de Inicio de Sesion
-  static const String correo = "Correo";
+  static const String correo = "Correo electrónico";
   static const String contrasena = "Contraseña";
-  static const String registrarse = "Registrarse";
-  static const String olvideContraena = "¿Olvidaste tu contraseña?";
+  static const String entrar = "Entrar";
+  static const String olvideContrasena = "¿Olvidaste tu contraseña?";
+  static const String crearCuenta = "Crear cuenta";
+
 // Pagina de Recuperación de contraseña
   static const String recuperarContrasena = "Recuperar contraseña";
   static const String token = "Token";
@@ -24,7 +27,9 @@ class AppStrings {
   static const String guardar = "Guardar";
 // Pagina de Registro
   static const String registro = "Registro";
-  static const String nombre = "Nombre";
+  static const String nombre = "Nombre(s)";
+  static const String app = "Apellido Paterno";
+  static const String apm = "Apellido Materno";
   static const String usuario = "Usuario";
   static const String fechaNacimiento = "Fecha de nacimiento";
   static const String registrar = "Registrar";
@@ -68,7 +73,6 @@ class AppStrings {
   static const String cerrarSesion = "Cerrar Sesión";
   static const String listaLecturas = "Lista de Lecturas";
   static const String listaFavoritos = "Lista de Favoritos";
-  static const String salir = "Salir";
   static const String eliminarCuenta = "Eliminar Cuenta";
 
 // Pagina de Premium
