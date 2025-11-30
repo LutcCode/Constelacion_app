@@ -16,7 +16,10 @@ class LibreriaPage extends StatefulWidget {
 
 class _LibreriaPageState extends State<LibreriaPage> {
   List<LibroModelLibreria> libros = [];
+  List<LibroModelLibreria> librosFiltrados = []; // <-- lista filtrada
   bool isLoading = true;
+
+  TextEditingController searchController = TextEditingController(); // <-- controlador
 
   Future<void> CargarLibros() async {
     try {
@@ -32,6 +35,8 @@ class _LibreriaPageState extends State<LibreriaPage> {
         libros = List<LibroModelLibreria>.from(
           responseJson.map((model) => LibroModelLibreria.fromJson(model)),
         );
+
+        librosFiltrados = libros; // <-- inicializar filtrados
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al cargar los libros')),
@@ -47,9 +52,45 @@ class _LibreriaPageState extends State<LibreriaPage> {
     });
   }
 
+  // --------------------------
+  // 🔍 FUNCIÓN PARA FILTRAR
+  // --------------------------
+  void _filtrarLibros(String query) {
+    final q = query.toLowerCase();
+
+    setState(() {
+      librosFiltrados = libros.where((libro) {
+        return libro.nombre_libro.toLowerCase().contains(q);
+      }).toList();
+    });
+  }
+
+  // --------------------------
+  // 🔍 SEARCH BAR COMPLETA
+  // --------------------------
+  Widget _searchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: searchController,
+        onChanged: _filtrarLibros,
+        decoration: InputDecoration(
+          hintText: 'Buscar libro...',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[100],
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        ),
+      ),
+    );
+  }
+
   Widget _gridLibros() {
-    if (libros.isEmpty) {
-      return const Center(child: Text('No hay reseñas disponibles'));
+    if (librosFiltrados.isEmpty) {
+      return const Center(child: Text('No hay libros disponibles'));
     }
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
@@ -59,9 +100,9 @@ class _LibreriaPageState extends State<LibreriaPage> {
         mainAxisSpacing: 10.0,
         childAspectRatio: 0.65,
       ),
-      itemCount: libros.length,
+      itemCount: librosFiltrados.length, // <-- usar filtrados
       itemBuilder: (context, index) {
-        final libro = libros[index];
+        final libro = librosFiltrados[index]; // <-- usar filtrados
         return Card(
           clipBehavior: Clip.antiAlias,
           elevation: 3.0,
@@ -69,13 +110,12 @@ class _LibreriaPageState extends State<LibreriaPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child:
-                libro.imagen.isNotEmpty
+                child: libro.imagen.isNotEmpty
                     ? Image.network(
                   libro.imagen,
                   fit: BoxFit.cover,
-                  errorBuilder:
-                      (context, error, stackTrace) => const Center(
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Center(
                     child: Icon(
                       Icons.book,
                       size: 40,
@@ -105,18 +145,19 @@ class _LibreriaPageState extends State<LibreriaPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.rate_review, size: 20),
                       onPressed: () {
-                        // Botón para editar reseña
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
+                            builder: (context) => resenaNueva(
+                                idResena: libro.id_resena, idLibro: libro.id),
                           ),
                         );
                       },
@@ -124,25 +165,24 @@ class _LibreriaPageState extends State<LibreriaPage> {
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
                       onPressed: () async {
-                        // ACCIÓN CRÍTICA: Navega a libreriaNuevo enviando el ID del libro para edición.
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => libreriaNuevo(idLibro: libro.id), // <-- Enviamos el ID del libro
+                            builder: (context) =>
+                                libreriaNuevo(idLibro: libro.id),
                           ),
                         );
-                        // Recarga la lista después de editar
                         CargarLibros();
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.visibility, size: 20),
                       onPressed: () {
-                        // Botón de Ver Reseña
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => resenaNueva(idResena: libro.id_resena, idLibro: libro.id),
+                            builder: (context) => resenaNueva(
+                                idResena: libro.id_resena, idLibro: libro.id),
                           ),
                         );
                       },
@@ -167,17 +207,21 @@ class _LibreriaPageState extends State<LibreriaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.libreria)),
-      body:
-      isLoading
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _gridLibros(),
+          : Column(
+        children: [
+          _searchBar(),            // <-- AGREGADO AQUÍ
+          Expanded(child: _gridLibros()),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const libreriaNuevo()),
           );
-          // Recarga la lista después de añadir un nuevo libro
+
           CargarLibros();
         },
         child: const Icon(Icons.add),

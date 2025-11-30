@@ -46,9 +46,8 @@ class _resenaPageState extends State<resenaPage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     }
     setState(() {
       isLoading = false;
@@ -65,113 +64,128 @@ class _resenaPageState extends State<resenaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('${AppStrings.appName}')),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child:
-                              txtImagen.text.isNotEmpty
-                                  ? Image.network(
-                                    txtImagen.text,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Center(
-                                              child: Icon(
-                                                Icons.book,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                  )
-                                  : const Center(
-                                    child: Icon(
-                                      Icons.book,
-                                      size: 40,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                        ),
-                        const SizedBox(width: 16.0),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text(
-                                  txtTitulo.text,
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                txtAutor.text,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight:
-                                      FontWeight
-                                          .normal, // Se quita el bold para diferenciarlo del título
-                                  fontSize: 16,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: txtImagen.text.isNotEmpty
+                      ? Image.network(
+                    txtImagen.text,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (context, error, stackTrace) => const Center(
+                      child: Icon(
+                        Icons.book,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                      : const Center(
+                    child: Icon(
+                      Icons.book,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          txtTitulo.text,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    const Divider(),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Text(
-                        "Acerca de ${txtTitulo.text}",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(fontSize: 30),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Text(
-                        txtDescripcion.text,
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(fontSize: 15),
+                      Text(
+                        txtAutor.text,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Divider(),
-                    const SizedBox(height: 16),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Text(
-                        "Reseña",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Text(
-                        txtResena.text,
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 16),
+
+            // -------------------------
+            // ACERCA DE... (IZQUIERDA)
+            // -------------------------
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  "Acerca de ${txtTitulo.text}",
+                  style: const TextStyle(fontSize: 30),
                 ),
               ),
+            ),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  txtDescripcion.text,
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 16),
+
+            // -------------------------
+            // RESEÑA (IZQUIERDA)
+            // -------------------------
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  "Reseña",
+                  style: const TextStyle(fontSize: 30),
+                ),
+              ),
+            ),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  txtResena.text,
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
