@@ -22,6 +22,7 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
   final TextEditingController txtName = TextEditingController();
   final TextEditingController txtAppLector = TextEditingController();
   final TextEditingController txtApmLector = TextEditingController();
+  final TextEditingController txtUsuario = TextEditingController();
   final TextEditingController txtEdad = TextEditingController();
   final TextEditingController txtFechaNacimiento = TextEditingController();
   final TextEditingController txtEmail = TextEditingController();
@@ -36,6 +37,7 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
           'name': txtName.text,
           'app_lector': txtAppLector.text,
           'apm_lector': txtApmLector.text,
+          'usuario': txtUsuario.text,
           'edad': txtEdad.text,
           'fecha_nacimiento': txtFechaNacimiento.text,
           'email': txtEmail.text,
@@ -134,6 +136,19 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
                       labelText: AppStrings.apm,
                       border: OutlineInputBorder(),
                       hintText: AppStrings.apm,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+                SizedBox(
+                  width: fieldWidth,
+                  child: TextFormField(
+                    controller: txtUsuario,
+                    validator: _validarCampo,
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.usuario,
+                      border: OutlineInputBorder(),
+                      hintText: AppStrings.usuario,
                     ),
                   ),
                 ),

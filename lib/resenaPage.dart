@@ -172,7 +172,6 @@ class _resenaPageState extends State<resenaPage> {
                 ),
               ),
             ),
-
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(

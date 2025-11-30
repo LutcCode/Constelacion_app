@@ -20,9 +20,12 @@ class _PerfilPageState extends State<PerfilPage> {
   final PageController _pageController = PageController();
   int _selectedPage = 0;
 
+  bool esPremium = false;
+
   List<LibroModelLibreria> libros = [];
   List<LibroModelLibreria> librosResenas = [];
   final TextEditingController txtNombre = TextEditingController();
+  final TextEditingController txtUsuario = TextEditingController();
   bool isLoading = true;
 
   void _goToPage(int index) {
@@ -30,15 +33,98 @@ class _PerfilPageState extends State<PerfilPage> {
     _pageController.jumpToPage(index);
   }
 
-  void _mostrarAlertaCorona() {
+  void _mostrarAlertaCorona() {    // 1. Comprobación inicial: Si ya es premium, mostramos mensaje informativo
+    if (esPremium) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            content: const Text(
+              'Ya eres usuario premium',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // 2. Si NO es premium, mostramos el diálogo de compra
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) { // Usamos 'dialogContext' para diferenciarlo
         return AlertDialog(
-          content: const Text('Deseas tener la membresia premium?.'),
+          content: const Text(
+            '¿Deseas tener la membresia premium?',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
+          ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () async {
+                try {
+                  // Realizamos la petición
+                  final response = await http.post(
+                    Uri.parse('${Ambiente.urlServer}/api/persona/premium'),
+                    body: jsonEncode(<String, dynamic>{'id': Ambiente.idUser}),
+                    headers: {
+                      'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                  );
+
+                  // Cerramos el diálogo de "¿Deseas...?" independientemente del resultado
+                  if (mounted) {
+                    Navigator.pop(dialogContext);
+                  }
+
+                  if (response.statusCode == 200) {
+                    // Actualizamos el estado
+                    setState(() {
+                      esPremium = true;
+                    });
+
+                    // 3. Mostramos el NUEVO mensaje de éxito
+                    if (mounted) {
+                      showDialog(
+                        context: context, // Usamos el context de la Página (State)
+                        builder: (newContext) {
+                          return AlertDialog(
+                            content: const Text(
+                              'Excelente ahora eres premium',
+                              textAlign: TextAlign.center, // Texto centrado
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(newContext),
+                                child: const Text('Aceptar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  } else {
+                    print("Error en el servidor: ${response.statusCode}");
+                  }
+                } catch (e) {
+                  print('Error en la petición: $e');
+                  // Si hubo error y el diálogo sigue abierto, lo cerramos
+                  if (mounted && Navigator.canPop(dialogContext)) {
+                    Navigator.pop(dialogContext);
+                  }
+                }
+              },
               child: const Text('Aceptar'),
             ),
           ],
@@ -46,6 +132,8 @@ class _PerfilPageState extends State<PerfilPage> {
       },
     );
   }
+
+
 
   Future<void> cargarLector() async {
     try {
@@ -62,6 +150,10 @@ class _PerfilPageState extends State<PerfilPage> {
 
         txtNombre.text =
             '${lector.name} ${lector.app_lector} ${lector.apm_lector}';
+        txtUsuario.text = '@${lector.usuario}';
+        setState(() {
+          esPremium = lector.suscripcion;
+        });
       } else {
         print(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -320,6 +412,8 @@ class _PerfilPageState extends State<PerfilPage> {
                   ),
                   const SizedBox(height: 10),
                   Text(txtNombre.text),
+                  const SizedBox(height: 10),
+                  Text(txtUsuario.text),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
