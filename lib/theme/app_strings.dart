@@ -14,7 +14,7 @@ class AppStrings {
   static const String contrasena = "Contraseña";
   static const String entrar = "Entrar";
   static const String olvideContrasena = "¿Olvidaste tu contraseña?";
-  static const String crearCuenta = "Crear cuenta";
+  static const String crearCuenta = "Nuevo usuario";
 
 // Pagina de Recuperación de contraseña
   static const String recuperarContrasena = "Recuperar contraseña";
