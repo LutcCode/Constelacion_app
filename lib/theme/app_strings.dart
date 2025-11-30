@@ -52,6 +52,7 @@ class AppStrings {
   static const String descripcion = "Descripción";
   static const String comentarios = "Comentarios";
   static const String calificacion = "Calificación";
+  static const String editarLibro = "Editar Libro";
 
   static const String fechaPublicacion = "Fecha de Publicación";
   static const String tipoLibroFisico = "Físico";
