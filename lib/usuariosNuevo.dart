@@ -28,7 +28,6 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
   final TextEditingController txtPassword = TextEditingController();
 
   Future<void> guardarLector() async {
-    // 2. VERIFICAMOS SI EL FORMULARIO ES VÁLIDO ANTES DE ENVIAR
     if (_formKey.currentState!.validate()) {
       final response = await http.post(
         Uri.parse('${Ambiente.urlServer}/api/persona/new'),
@@ -46,8 +45,44 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+
       if (response.body == 'ok') {
         if (!mounted) return;
+
+
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                'Aviso de Privacidad',
+                textAlign: TextAlign.center,
+              ),
+              content: SizedBox(
+                height: 300,
+                child: SingleChildScrollView(
+                  child: const Text(
+                    'Tus datos personales serán utilizados exclusivamente para brindarte acceso al sistema, validar tu identidad y mejorar la experiencia dentro de la aplicación. No compartimos tu información con terceros y esta se mantiene protegida mediante medidas de seguridad técnicas y administrativas.\n\n'
+                        'Al continuar, aceptas que la aplicación pueda almacenar tu información de manera segura para fines operativos esenciales. Tu información se almacena de forma segura y puedes solicitar en cualquier momento el acceso, corrección o eliminación de tus datos.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Aceptar'),
+                ),
+              ],
+            );
+          },
+        );
+
         QuickAlert.show(
           context: context,
           type: QuickAlertType.success,
@@ -62,19 +97,21 @@ class _UsuariosnuevoState extends State<Usuariosnuevo> {
             );
           },
         );
+
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al guardar lector')),
         );
       }
+
     } else {
-      // Si faltan campos, mostramos un mensaje rápido
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, llena todos los campos')),
       );
     }
   }
+
 
   // Función auxiliar para validar campos vacíos
   String? _validarCampo(String? value) {
