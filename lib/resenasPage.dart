@@ -14,7 +14,9 @@ class ResenasPage extends StatefulWidget {
 
 class _ResenasPageState extends State<ResenasPage> {
   List<ResenaModel> resenas = [];
+  List<ResenaModel> resenasFiltradas = []; // Lista para la búsqueda
   bool isLoading = true;
+  TextEditingController searchController = TextEditingController(); // Controlador del input
 
   Future<void> cargarResenas() async {
     try {
@@ -27,39 +29,85 @@ class _ResenasPageState extends State<ResenasPage> {
       );
       if (response.statusCode == 200) {
         Iterable responseJson = jsonDecode(response.body);
-        resenas = List<ResenaModel>.from(
+        final listaTemp = List<ResenaModel>.from(
           responseJson.map((model) => ResenaModel.fromJson(model)),
         );
+
+        setState(() {
+          resenas = listaTemp;
+          resenasFiltradas = listaTemp; // Inicializamos la lista filtrada
+          isLoading = false;
+        });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al cargar las reseñas')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error al cargar las reseñas')),
+          );
+        }
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  // Función para filtrar
+  void _filtrarResenas(String query) {
+    final filtradas = resenas.where((resena) {
+      final tituloLower = resena.titulo.toLowerCase();
+      final queryLower = query.toLowerCase();
+      return tituloLower.contains(queryLower);
+    }).toList();
+
     setState(() {
-      isLoading = false;
+      resenasFiltradas = filtradas;
     });
   }
 
+  Widget _searchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: searchController,
+        onChanged: _filtrarResenas,
+        decoration: InputDecoration(
+          hintText: 'Buscar reseña...',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          filled: true,
+          fillColor: Colors.grey[100],
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        ),
+      ),
+    );
+  }
+
   Widget _gridResenas() {
-    if (resenas.isEmpty) {
+    if (resenasFiltradas.isEmpty) {
       return const Center(child: Text('No hay reseñas disponibles'));
     }
     return GridView.builder(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0), // Ajustado padding
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 10.0,
         mainAxisSpacing: 10.0,
         childAspectRatio: 0.65,
       ),
-      itemCount: resenas.length,
+      itemCount: resenasFiltradas.length, // Usamos la lista filtrada
       itemBuilder: (context, index) {
-        final resena = resenas[index];
+        final resena = resenasFiltradas[index]; // Usamos la lista filtrada
         return GestureDetector(
           onTap: () {
             Navigator.push(
@@ -77,26 +125,26 @@ class _ResenasPageState extends State<ResenasPage> {
               children: [
                 Expanded(
                   child:
-                      resena.imagen.isNotEmpty
-                          ? Image.network(
-                            resena.imagen,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) => const Center(
-                                  child: Icon(
-                                    Icons.book,
-                                    size: 40,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                          )
-                          : const Center(
-                            child: Icon(
-                              Icons.book,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                          ),
+                  resena.imagen.isNotEmpty
+                      ? Image.network(
+                    resena.imagen,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (context, error, stackTrace) => const Center(
+                      child: Icon(
+                        Icons.book,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                      : const Center(
+                    child: Icon(
+                      Icons.book,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -127,13 +175,23 @@ class _ResenasPageState extends State<ResenasPage> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose(); // Limpieza del controlador
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Resenas')),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _gridResenas(),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column( // Usamos Column para poner la barra arriba del Grid
+        children: [
+          _searchBar(),
+          Expanded(child: _gridResenas()),
+        ],
+      ),
     );
   }
 }
