@@ -404,7 +404,7 @@ class _PerfilPageState extends State<PerfilPage> {
                   const SizedBox(height: 20),
                   CircleAvatar(
                     radius: 50,
-                    backgroundImage: AssetImage("images/icono1.png"),
+                    backgroundImage: AssetImage("images/Icono1.png"),
                     backgroundColor: Colors.grey[200],
                     onBackgroundImageError: (exception, stackTrace) {
                       print('Error al cargar la imagen local: $exception');

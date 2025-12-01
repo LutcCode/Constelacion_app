@@ -110,7 +110,7 @@ class _perfilEditarState extends State<perfilEditar> {
               //const SizedBox(height: 10),
               CircleAvatar(
                 radius: 50,
-                backgroundImage: const AssetImage("images/icono1.png"),
+                backgroundImage: const AssetImage("images/Icono1.png"),
                 backgroundColor: Colors.grey[200],
                 onBackgroundImageError: (exception, stackTrace) {
                   print('Error al cargar la imagen local: $exception');
