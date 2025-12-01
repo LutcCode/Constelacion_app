@@ -183,7 +183,7 @@ class _ResenasPageState extends State<ResenasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Resenas')),
+      appBar: AppBar(title: const Text('Reseñas')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column( // Usamos Column para poner la barra arriba del Grid

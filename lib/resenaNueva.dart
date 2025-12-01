@@ -142,7 +142,7 @@ class _resenaNuevaState extends State<resenaNueva> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Mi reseña - ID: ${widget.idLibro}")),
+      appBar: AppBar(title: Text("Mi reseña")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
