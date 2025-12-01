@@ -199,8 +199,8 @@ class _loginPageState extends State<loginPage> {
           children: [
             Center(
               child: ClipOval(
-                child: Image.network(
-                  "images/logo.png",
+                child: Image.asset(
+                  "images/logo.png", // Asegúrate de que esta ruta coincida con tu carpeta real
                   width: 250,
                   height: 250,
                   fit: BoxFit.cover,
