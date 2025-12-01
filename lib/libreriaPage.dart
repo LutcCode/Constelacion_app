@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:constelacion/models/ambiente.dart';
 import 'package:constelacion/models/LibroModelLibreria.dart';
+import 'package:constelacion/models/lectorModel.dart';
 import 'package:constelacion/theme/app_strings.dart';
 
 class LibreriaPage extends StatefulWidget {
@@ -15,11 +16,34 @@ class LibreriaPage extends StatefulWidget {
 }
 
 class _LibreriaPageState extends State<LibreriaPage> {
+  bool Premuim = false;
   List<LibroModelLibreria> libros = [];
   List<LibroModelLibreria> librosFiltrados = []; // <-- lista filtrada
   bool isLoading = true;
 
-  TextEditingController searchController = TextEditingController(); // <-- controlador
+  TextEditingController searchController =
+      TextEditingController(); // <-- controlador
+
+  Future<void> cargarPersona() async {
+    final response = await http.post(
+      Uri.parse('${Ambiente.urlServer}/api/persona'),
+      body: jsonEncode(<String, dynamic>{'id': Ambiente.idUser}),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseJson = jsonDecode(response.body);
+      final persona = LectorModel.fromJson(responseJson);
+
+      // AGREGAR setState AQUÍ para asegurar que la app sepa que ya cargó el premium
+      setState(() {
+        Premuim = persona.suscripcion;
+      });
+    }
+  }
+
 
   Future<void> CargarLibros() async {
     try {
@@ -59,9 +83,10 @@ class _LibreriaPageState extends State<LibreriaPage> {
     final q = query.toLowerCase();
 
     setState(() {
-      librosFiltrados = libros.where((libro) {
-        return libro.nombre_libro.toLowerCase().contains(q);
-      }).toList();
+      librosFiltrados =
+          libros.where((libro) {
+            return libro.nombre_libro.toLowerCase().contains(q);
+          }).toList();
     });
   }
 
@@ -77,9 +102,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
         decoration: InputDecoration(
           hintText: 'Buscar libro...',
           prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
           filled: true,
           fillColor: Colors.grey[100],
           contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -110,26 +133,23 @@ class _LibreriaPageState extends State<LibreriaPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: libro.imagen.isNotEmpty
-                    ? Image.network(
-                  libro.imagen,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                  const Center(
-                    child: Icon(
-                      Icons.book,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
-                  ),
-                )
-                    : const Center(
-                  child: Icon(
-                    Icons.book,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-                ),
+                child:
+                    libro.imagen.isNotEmpty
+                        ? Image.network(
+                          libro.imagen,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.book,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                        )
+                        : const Center(
+                          child: Icon(Icons.book, size: 40, color: Colors.grey),
+                        ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -145,8 +165,10 @@ class _LibreriaPageState extends State<LibreriaPage> {
                 ),
               ),
               Padding(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4.0,
+                  vertical: 4.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -156,8 +178,11 @@ class _LibreriaPageState extends State<LibreriaPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => resenaNueva(
-                                idResena: libro.id_resena, idLibro: libro.id),
+                            builder:
+                                (context) => resenaNueva(
+                                  idResena: libro.id_resena,
+                                  idLibro: libro.id,
+                                ),
                           ),
                         );
                       },
@@ -168,8 +193,8 @@ class _LibreriaPageState extends State<LibreriaPage> {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                libreriaNuevo(idLibro: libro.id),
+                            builder:
+                                (context) => libreriaNuevo(idLibro: libro.id),
                           ),
                         );
                         CargarLibros();
@@ -181,8 +206,11 @@ class _LibreriaPageState extends State<LibreriaPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => resenaNueva(
-                                idResena: libro.id_resena, idLibro: libro.id),
+                            builder:
+                                (context) => resenaNueva(
+                                  idResena: libro.id_resena,
+                                  idLibro: libro.id,
+                                ),
                           ),
                         );
                       },
@@ -200,6 +228,7 @@ class _LibreriaPageState extends State<LibreriaPage> {
   @override
   void initState() {
     super.initState();
+    cargarPersona();
     CargarLibros();
   }
 
@@ -207,16 +236,34 @@ class _LibreriaPageState extends State<LibreriaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.libreria)),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          _searchBar(),            // <-- AGREGADO AQUÍ
-          Expanded(child: _gridLibros()),
-        ],
-      ),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  _searchBar(), // <-- AGREGADO AQUÍ
+                  Expanded(child: _gridLibros()),
+                ],
+              ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // --- INICIO VALIDACIÓN ---
+          // Condición: Si NO es premium (false) Y ya tiene 10 o más libros
+          if (!Premuim && libros.length >= 10) {
+            // Muestra mensaje de error
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Límite de 10 libros alcanzado. Hazte Premium para agregar ilimitados.'),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 3),
+              ),
+            );
+            return; // DETIENE la ejecución aquí. No abre la siguiente pantalla.
+          }
+          // --- FIN VALIDACIÓN ---
+
+          // Si el código llega aquí, es porque es Premium O tiene menos de 10 libros
           await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const libreriaNuevo()),
